@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\EngineClasses">
+      <UniqueIdentifier>{86b02d63-b841-497d-95a2-86a47ec46e73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\MathematicalClasses">
+      <UniqueIdentifier>{86adf3d1-3ae4-4c2e-9edd-dde61a14a147}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\TexturingClasses">
+      <UniqueIdentifier>{18f330b9-0dbd-409b-9483-e762c8ceaaf8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\RenderingClasses">
+      <UniqueIdentifier>{70557f24-d0ed-41bf-8315-72f3208980db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\InstanceClasses">
+      <UniqueIdentifier>{1da89756-e1aa-49a1-b1ed-58a18cd6283b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\InstanceClasses\Lighting">
+      <UniqueIdentifier>{127b6154-32c0-41ee-acdc-bc95a74930d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\InstanceClasses\MatrixBased">
+      <UniqueIdentifier>{e8c46f41-9fff-488c-bdb7-4381ca382cde}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Engine.h">
+      <Filter>Header Files\EngineClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="Matrix4x4.h">
+      <Filter>Header Files\MathematicalClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector2D.h">
+      <Filter>Header Files\MathematicalClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector3D.h">
+      <Filter>Header Files\MathematicalClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="ColourRGB.h">
+      <Filter>Header Files\TexturingClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Header Files\TexturingClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Header Files\RenderingClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="Triangle.h">
+      <Filter>Header Files\RenderingClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="Point.h">
+      <Filter>Header Files\RenderingClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="Folder.h">
+      <Filter>Header Files\InstanceClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="MatrixInstance.h">
+      <Filter>Header Files\InstanceClasses\MatrixBased</Filter>
+    </ClInclude>
+    <ClInclude Include="Instance.h">
+      <Filter>Header Files\InstanceClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="Subworld.h">
+      <Filter>Header Files\InstanceClasses\MatrixBased</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshInstance.h">
+      <Filter>Header Files\InstanceClasses\MatrixBased</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
+      <Filter>Header Files\InstanceClasses\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="AmbientLight.h">
+      <Filter>Header Files\InstanceClasses\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectionalLight.h">
+      <Filter>Header Files\InstanceClasses\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="PointLight.h">
+      <Filter>Header Files\InstanceClasses\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="SpotLight.h">
+      <Filter>Header Files\InstanceClasses\Lighting</Filter>
+    </ClInclude>
+    <ClInclude Include="World.h">
+      <Filter>Header Files\InstanceClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineIO.h">
+      <Filter>Header Files\EngineClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Header Files\InstanceClasses\MatrixBased</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineExceptions.h">
+      <Filter>Header Files\EngineClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="InstanceHeirachy.h">
+      <Filter>Header Files\InstanceClasses</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets" />
+  </ItemGroup>
+</Project>
