@@ -222,6 +222,11 @@ namespace InstanceHeirachy
 			Name = NewName;
 		}
 
+        int GetInstanceID()
+        {
+            return InstanceID;
+        }
+
 		int GetParentID()
 		{
 			return ParentID;
@@ -237,14 +242,22 @@ namespace InstanceHeirachy
 			if (NewParent == NULL)
 			{
                 throw EngineException("Cannot set Parent to a NULL Instance", "Attempt to set parent of " + Name + " but that instance does not exist");
+                return false;
 			}
 			if (!NewParent->CanHaveChildren)
 			{
                 throw EngineException("Cannot set Parent to an Instance that cannot have children", "Attempt to set parent of " + Name + " as " + NewParent->GetName());
+                return false;
 			}
             if (NewParent->IsDescendantOf(InstanceID))
             {
                 throw EngineException("Cannot set a descendant of an Instance as its Parent", "Attemp to set parent of " + Name + " as it's descendant " + NewParent->GetName());
+                return false;
+            }
+            if (NewParent->GetInstanceID() == InstanceID)
+            {
+                throw EngineException("Cannot set a Instances Parent as itself", "Attempt to set parent of " + Name + " as itself");
+                return false;
             }
 
 			//parse through the current parents children and remove all references to self

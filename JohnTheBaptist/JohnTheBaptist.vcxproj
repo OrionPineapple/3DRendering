@@ -150,7 +150,6 @@
     <ClInclude Include="MeshInstance.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="PointLight.h" />
-    <ClInclude Include="SpotLight.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Subworld.h" />
     <ClInclude Include="Texture.h" />

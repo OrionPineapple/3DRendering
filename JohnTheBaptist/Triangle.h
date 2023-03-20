@@ -18,6 +18,11 @@ protected:
 	Vector3D NormalB;
 	Vector3D NormalC;
 
+    ColourRGB AmbientColour;
+    ColourRGB DiffuseColour;
+    ColourRGB SpecularColour;
+    std::shared_ptr<Texture> TextureReference;
+
 private:
 	Triangle()
 	{
@@ -54,6 +59,46 @@ public:
 	}
 
 public:
+    ColourRGB GetAmbient()
+    {
+        return AmbientColour;
+    }
+
+    ColourRGB GetSpecular()
+    {
+        return SpecularColour;
+    }
+
+    ColourRGB GetDiffuse()
+    {
+        return DiffuseColour;
+    }
+
+    void SetAmbient(ColourRGB NewAmbient)
+    {
+        AmbientColour = NewAmbient;
+    }
+
+    void SetSpecular(ColourRGB NewSpecular)
+    {
+        SpecularColour = NewSpecular;
+    }
+
+    void SetDiffuse(ColourRGB NewDiffuse)
+    {
+        DiffuseColour = NewDiffuse;
+    }
+
+    std::shared_ptr<Texture> GetTexture()
+    {
+        return TextureReference;
+    }
+
+    void SetTexture(std::shared_ptr<Texture> Tex)
+    {
+        TextureReference = Tex;
+    }
+
 	void SetVertexNormals(Vector3D NA, Vector3D NB, Vector3D NC)
 	{
 		VertexNormalsEnabled = true;

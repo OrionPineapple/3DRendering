@@ -24,14 +24,14 @@ private:
     //Instance Stuff
     InstanceHeirachy::Camera* Camera;
     InstanceHeirachy::World World;
-    InstanceHeirachy::Folder* WorldRoot;
+    InstanceHeirachy::SubWorld* WorldRoot;
 
 public:
 	Engine(float FoV = PI * 0.5f)
 	{
 		RunTime = 0.0f;
         Camera = new InstanceHeirachy::Camera(&World, FoV, &EngineController);
-        WorldRoot = new InstanceHeirachy::Folder(&World);
+        WorldRoot = new InstanceHeirachy::SubWorld(&World);
 	}
 
 	bool Start(std::string Name, int Height = DefaultHeight, int Width = DefaultWidth)
@@ -162,9 +162,9 @@ private:
 			//b,k is inline
 		}
 
-        PlacePoint(x_a, y_a, 1.0f);
-        PlacePoint(x_b, y_b, 1.0f);
-        PlacePoint(x_c, y_c, 1.0f);
+        //PlacePoint(x_a, y_a, 1.0f);
+        //PlacePoint(x_b, y_b, 1.0f);
+        //PlacePoint(x_c, y_c, 1.0f);
 	}
 
 	void FillTriangleWithNormals(Triangle& ProjectedTriangle, Vector3D& A, Vector3D& B, Vector3D& C, Vector3D& LightDirection)

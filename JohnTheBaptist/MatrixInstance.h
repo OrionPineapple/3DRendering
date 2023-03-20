@@ -10,12 +10,12 @@ namespace InstanceHeirachy
 	protected:
 		Matrix4x4 Matrix;
 
-	public:
-        virtual void OutputName() { std::cout << Name; };
+
         MatrixInstance()
         {
             BaseType = InstanceBaseType::MatrixInstanceBaseType;
         }
+	public:
 
 		void Transform(Matrix4x4 Transformation)
 		{

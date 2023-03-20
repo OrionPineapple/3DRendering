@@ -13,5 +13,10 @@ namespace InstanceHeirachy
             BaseType = InstanceBaseType::MatrixInstanceBaseType;
             CanHaveChildren = true;
         }
+
+        void GetFilteredSubWorldInhabitants(std::vector<Light*> Lights, std::vector<SubWorld*> SubWorlds, std::vector<MeshInstance*> Meshes)
+        {
+
+        }
     };
 }

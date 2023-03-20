@@ -95,9 +95,6 @@
     <ClInclude Include="PointLight.h">
       <Filter>Header Files\InstanceClasses\Lighting</Filter>
     </ClInclude>
-    <ClInclude Include="SpotLight.h">
-      <Filter>Header Files\InstanceClasses\Lighting</Filter>
-    </ClInclude>
     <ClInclude Include="World.h">
       <Filter>Header Files\InstanceClasses</Filter>
     </ClInclude>

@@ -14,7 +14,6 @@
 //Lighting Based
 #include "Light.h"
 #include "PointLight.h"
-#include "SpotLight.h"
 #include "DirectionalLight.h"
 #include "AmbientLight.h"
 
@@ -35,9 +34,6 @@ namespace InstanceHeirachy
             throw EngineException("Unhandled instance type", "Need to implement deletion for this pointer type");
             break;
         case InstanceType::PointLightType:
-            throw EngineException("Unhandled instance type", "Need to implement deletion for this pointer type");
-            break;
-        case InstanceType::SpotLightType:
             throw EngineException("Unhandled instance type", "Need to implement deletion for this pointer type");
             break;
 

@@ -19,7 +19,6 @@ namespace InstanceHeirachy
         AmbientLightType = 10,
         DirectionalLightType = 11,
         PointLightType = 12,
-        SpotLightType = 13,
 
         MeshInstanceType = 14,
         SubWorldType = 15,

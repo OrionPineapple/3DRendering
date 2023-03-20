@@ -12,9 +12,9 @@ protected:
 public:
 	ColourRGB()
 	{
-		Red = 0;
-		Green = 0;
-		Blue = 0;
+		Red = 255;
+		Green = 255;
+		Blue = 255;
 	}
 
 	ColourRGB(int R, int G, int B)
@@ -23,6 +23,12 @@ public:
 		Green = G;
 		Blue = B;
 	}
+    ColourRGB(float R, float G, float B)
+    {
+        Red = R * 255.0f;
+        Green = G * 255.0f;
+        Blue = B * 255.0f;
+    }
 
 public:
 	float GetBrightness()
@@ -30,7 +36,7 @@ public:
 		//Returns a value between 0 and 1
 		//0 being pitch black and 1 being full bright white
 		float SquaredSums = (float)(Red * Red) + (float)(Green * Green) + (float)(Blue * Blue);
-		SquaredSums /= (256.0f * 256.0f);
+		SquaredSums /= (255.0f * 255.0f);
 		return sqrtf(SquaredSums);
 	}
 
@@ -65,13 +71,13 @@ public:
         {
             //an interpolation of two colours that accounts for their non linear values
             //but still a correct and "true" linear intepolation
-            float FromR = From.Red * From.Red / 256.0f;
-            float FromG = From.Green * From.Green / 256.0f;
-            float FromB = From.Blue * From.Blue / 256.0f;
+            float FromR = From.Red * From.Red / 255.0f;
+            float FromG = From.Green * From.Green / 255.0f;
+            float FromB = From.Blue * From.Blue / 255.0f;
 
-            float ToR = To.Red * To.Red / 256.0f;
-            float ToG = To.Green * To.Green / 256.0f;
-            float ToB = To.Blue * To.Blue / 256.0f;
+            float ToR = To.Red * To.Red / 255.0f;
+            float ToG = To.Green * To.Green / 255.0f;
+            float ToB = To.Blue * To.Blue / 255.0f;
 
             float EndR = FromR + Alpha * (ToR - FromR);
             float EndG = FromG + Alpha * (ToG - FromG);
@@ -115,9 +121,9 @@ public:
 	{
 		//multiply two colours
 		return ColourRGB(
-			(A.Red * B.Red) / 256,
-			(A.Blue * B.Blue) / 256,
-			(A.Green * B.Green) / 256);
+			(A.Red * B.Red) / 255,
+			(A.Blue * B.Blue) / 255,
+			(A.Green * B.Green) / 255);
 	}
 };
 

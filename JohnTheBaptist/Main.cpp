@@ -85,14 +85,14 @@ private:
 	{
 		//After 3D Rendering
 
-        for (int y = 0; y < 400; y++)
+        /*for (int y = 0; y < 400; y++)
         {
             for (int x = 0; x < 400; x++)
             {
                 ColourRGB Colour = Tex.Get(x, y);
                 Draw(x, y, Colour);
             }
-        }
+        }*/
 
 		return true;
 	}
