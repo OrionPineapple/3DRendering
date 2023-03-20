@@ -396,12 +396,11 @@ private:
     {
         float Denominator = Vector3D::Dot(B - A, Plane.UnitDirection);
         if (Denominator == 0.0f) { return -1.0f; }
-        return Vector3D::Dot(Plane.Position - A, Plane.UnitDirection) / Denominator;
+        return -Vector3D::Dot(A - Plane.Position, Plane.UnitDirection) / Denominator;
     }
 
     void ClipTriangle1Point(std::vector<Triangle>& Triangles, InstanceHeirachy::Plane& Plane, Triangle& Tri)
     {
-        if (IsKeyDown(olc::Key::J)) { return; }
         Point A = *Tri.GetPointA();
         Point B = *Tri.GetPointB();
         Point C = *Tri.GetPointC();
@@ -422,13 +421,11 @@ private:
                 Vector3D NewNormalA = Vector3D::Interpolate(Tri.GetVertexNormalC(), Tri.GetVertexNormalA(), CA);
                 Vector3D NewNormalB = Vector3D::Interpolate(Tri.GetVertexNormalB(), Tri.GetVertexNormalC(), BC);
                 Triangle NewTri = Triangle(std::make_shared<Point>(NewA), std::make_shared<Point>(NewB), Tri.GetPointC(), NewNormalA, NewNormalB, Tri.GetVertexNormalC());
-                NewTri.OnePointer = true;
                 Triangles.push_back(NewTri);
             }
             else
             {
                 Triangle NewTri = Triangle(std::make_shared<Point>(NewA), std::make_shared<Point>(NewB), Tri.GetPointC());
-                NewTri.OnePointer = true;
                 Triangles.push_back(NewTri);
             }
         }
@@ -444,13 +441,11 @@ private:
                 Vector3D NewNormalA = Vector3D::Interpolate(Tri.GetVertexNormalC(), Tri.GetVertexNormalA(), CA);
                 Vector3D NewNormalC = Vector3D::Interpolate(Tri.GetVertexNormalB(), Tri.GetVertexNormalC(), BC);
                 Triangle NewTri = Triangle(std::make_shared<Point>(NewA), Tri.GetPointB(), std::make_shared<Point>(NewC), NewNormalA, Tri.GetVertexNormalB(), NewNormalC);
-                NewTri.OnePointer = true;
                 Triangles.push_back(NewTri);
             }
             else
             {
                 Triangle NewTri = Triangle(std::make_shared<Point>(NewA), Tri.GetPointB(), std::make_shared<Point>(NewC));
-                NewTri.OnePointer = true;
                 Triangles.push_back(NewTri);
             }
         }
@@ -466,13 +461,11 @@ private:
                 Vector3D NewNormalB = Vector3D::Interpolate(Tri.GetVertexNormalA(), Tri.GetVertexNormalB(), AB);
                 Vector3D NewNormalC = Vector3D::Interpolate(Tri.GetVertexNormalC(), Tri.GetVertexNormalA(), CA);
                 Triangle NewTri = Triangle(Tri.GetPointA(), std::make_shared<Point>(NewB), std::make_shared<Point>(NewC), Tri.GetVertexNormalA(), NewNormalB, NewNormalC);
-                NewTri.OnePointer = true;
                 Triangles.push_back(NewTri);
             }
             else
             {
                 Triangle NewTri = Triangle(Tri.GetPointA(), std::make_shared<Point>(NewB), std::make_shared<Point>(NewC));
-                NewTri.OnePointer = true;
                 Triangles.push_back(NewTri);
             }
         }
@@ -480,7 +473,6 @@ private:
 
     void ClipTriangle2Point(std::vector<Triangle>& Triangles, InstanceHeirachy::Plane& Plane, Triangle& Tri)
     {
-        if (IsKeyDown(olc::Key::J)) { return; }
         Point A = *Tri.GetPointA();
         Point B = *Tri.GetPointB();
         Point C = *Tri.GetPointC();
@@ -500,20 +492,22 @@ private:
             {
                 Vector3D NormalX = Vector3D::Interpolate(Tri.GetVertexNormalC(), Tri.GetVertexNormalA(), CA);
                 Vector3D NormalY = Vector3D::Interpolate(Tri.GetVertexNormalB(), Tri.GetVertexNormalC(), BC);
-                Triangle NewTri = Triangle(Tri.GetPointA(), Tri.GetPointB(), std::make_shared<Point>(Y), Tri.GetVertexNormalA(), Tri.GetVertexNormalB(), NormalY);
-                NewTri.TwoPointerA = true;
+
+                Triangle NewTri = Triangle(std::shared_ptr<Point>(new Point(A)), std::shared_ptr<Point>(new Point(B)), std::shared_ptr<Point>(new Point(Y)), Tri.GetVertexNormalA(), Tri.GetVertexNormalB(), NormalY);
+
+                Triangle NewTri2 = Triangle(std::shared_ptr<Point>(new Point(Y)), std::shared_ptr<Point>(new Point(X)), std::shared_ptr<Point>(new Point(A)), NormalY, NormalX, Tri.GetVertexNormalA());
+
                 Triangles.push_back(NewTri);
-                NewTri = Triangle(std::make_shared<Point>(Y), std::make_shared<Point>(X), Tri.GetPointA(), NormalY, NormalX, Tri.GetVertexNormalA());
-                NewTri.TwoPointerB = true;
-                Triangles.push_back(NewTri);
+                Triangles.push_back(NewTri2);
             }
             else
             {
-                Triangle NewTri = Triangle(Tri.GetPointA(), Tri.GetPointB(), std::make_shared<Point>(Y));
-                NewTri.TwoPointerA = true;
+                Triangle NewTri = Triangle(Tri.GetPointA(), Tri.GetPointB(), std::shared_ptr<Point>(new Point(Y)));
+
                 Triangles.push_back(NewTri);
-                NewTri = Triangle(std::make_shared<Point>(Y), std::make_shared<Point>(X), Tri.GetPointA());
-                NewTri.TwoPointerB = true;
+
+                Triangle NewTri2 = Triangle(std::shared_ptr<Point>(new Point(Y)), std::shared_ptr<Point>(new Point(X)), Tri.GetPointA());
+
                 Triangles.push_back(NewTri);
             }
         }
@@ -528,21 +522,23 @@ private:
             {
                 Vector3D NormalX = Vector3D::Interpolate(Tri.GetVertexNormalB(), Tri.GetVertexNormalC(), BC);
                 Vector3D NormalY = Vector3D::Interpolate(Tri.GetVertexNormalA(), Tri.GetVertexNormalB(), AB);
-                Triangle NewTri = Triangle(Tri.GetPointC(), Tri.GetPointA(), std::make_shared<Point>(Y), Tri.GetVertexNormalC(), Tri.GetVertexNormalA(), NormalY);
-                NewTri.TwoPointerA = true;
+
+                Triangle NewTri = Triangle(std::shared_ptr<Point>(new Point(C)), std::shared_ptr<Point>(new Point(A)), std::shared_ptr<Point>(new Point(Y)), Tri.GetVertexNormalC(), Tri.GetVertexNormalA(), NormalY);
+
+                Triangle NewTri2 = Triangle(std::shared_ptr<Point>(new Point(Y)), std::shared_ptr<Point>(new Point(X)), std::shared_ptr<Point>(new Point(C)), NormalY, NormalX, Tri.GetVertexNormalC());
+
                 Triangles.push_back(NewTri);
-                NewTri = Triangle(std::make_shared<Point>(Y), std::make_shared<Point>(X), Tri.GetPointC(), NormalY, NormalX, Tri.GetVertexNormalC());
-                NewTri.TwoPointerB = true;
-                Triangles.push_back(NewTri);
+                Triangles.push_back(NewTri2);
             }
             else
             {
-                Triangle NewTri = Triangle(Tri.GetPointC(), Tri.GetPointA(), std::make_shared<Point>(Y));
-                NewTri.TwoPointerA = true;
+                Triangle NewTri = Triangle(Tri.GetPointC(), Tri.GetPointA(), std::shared_ptr<Point>(new Point (Y)));
+
                 Triangles.push_back(NewTri);
-                NewTri = Triangle(std::make_shared<Point>(Y), std::make_shared<Point>(X), Tri.GetPointC());
-                NewTri.TwoPointerB = true;
-                Triangles.push_back(NewTri);
+
+                Triangle NewTri2 = Triangle(std::shared_ptr<Point>(new Point(Y)), std::shared_ptr<Point>(new Point(X)), Tri.GetPointC());
+
+                Triangles.push_back(NewTri2);
             }
         }
         else
@@ -556,46 +552,49 @@ private:
             {
                 Vector3D NormalX = Vector3D::Interpolate(Tri.GetVertexNormalA(), Tri.GetVertexNormalB(), AB);
                 Vector3D NormalY = Vector3D::Interpolate(Tri.GetVertexNormalC(), Tri.GetVertexNormalA(), CA);
-                Triangle NewTri = Triangle(Tri.GetPointB(), Tri.GetPointC(), std::make_shared<Point>(Y), Tri.GetVertexNormalB(), Tri.GetVertexNormalC(), NormalY);
-                NewTri.TwoPointerA = true;
+                Triangle NewTri = Triangle(std::shared_ptr<Point>(new Point(B)), std::shared_ptr<Point>(new Point(C)), std::shared_ptr<Point>(new Point(Y)), Tri.GetVertexNormalB(), Tri.GetVertexNormalC(), NormalY);
+
+                Triangle NewTri2 = Triangle(std::shared_ptr<Point>(new Point(Y)), std::shared_ptr<Point>(new Point(X)), std::shared_ptr<Point>(new Point(B)), NormalY, NormalX, Tri.GetVertexNormalB());
+
                 Triangles.push_back(NewTri);
-                NewTri = Triangle(std::make_shared<Point>(Y), std::make_shared<Point>(X), Tri.GetPointB(), NormalY, NormalX, Tri.GetVertexNormalB());
-                NewTri.TwoPointerB = true;
-                Triangles.push_back(NewTri);
+                Triangles.push_back(NewTri2);
             }
             else
             {
-                Triangle NewTri = Triangle(Tri.GetPointB(), Tri.GetPointC(), std::make_shared<Point>(Y));
-                NewTri.TwoPointerA = true;
+                Triangle NewTri = Triangle(Tri.GetPointB(), Tri.GetPointC(), std::shared_ptr<Point>(new Point(Y)));
+
                 Triangles.push_back(NewTri);
-                NewTri = Triangle(std::make_shared<Point>(Y), std::make_shared<Point>(X), Tri.GetPointB());
-                NewTri.TwoPointerB = true;
-                Triangles.push_back(NewTri);
+
+                Triangle NewTri2 = Triangle(std::shared_ptr<Point>(new Point(Y)), std::shared_ptr<Point>(new Point(X)), Tri.GetPointB());
+
+                Triangles.push_back(NewTri2);
             }
         }
     }
 
-    void CullTriangles(std::vector<Triangle>& Triangles, InstanceHeirachy::Plane& CullingPlane)
+    std::vector<Triangle> CullTriangles(std::vector<Triangle>& Triangles, InstanceHeirachy::Plane& CullingPlane)
     {
+        std::vector<Triangle> NewTriangles;
         for (int i = 0; i < Triangles.size(); i++)
         {
             switch (HowManyPointsBehindPlane(CullingPlane, Triangles[i]))
             {
             case 3:
+                NewTriangles.push_back(Triangles[i]);
                 break;
             case 0:
-                Triangles.erase(Triangles.begin() + i);
                 break;
             case 1:
-                Triangles.erase(Triangles.begin() + i);
-                ClipTriangle1Point(Triangles, CullingPlane, Triangles[i]);
+                ClipTriangle1Point(NewTriangles, CullingPlane, Triangles[i]);
                 break;
             case 2:
-                Triangles.erase(Triangles.begin() + i);
-                ClipTriangle2Point(Triangles, CullingPlane, Triangles[i]);
+                ClipTriangle2Point(NewTriangles, CullingPlane, Triangles[i]);
+                break;
+            default:
                 break;
             }
         }
+        return NewTriangles;
     }
 
 	bool OnUpdate(float DeltaTime)
@@ -663,7 +662,7 @@ private:
 
                 for (InstanceHeirachy::Plane CullingPlane : CullingPlanes)
                 {
-                    CullTriangles(TrianglesToRender, CullingPlane);
+                    TrianglesToRender = CullTriangles(TrianglesToRender, CullingPlane);
                 }
 
                 for (Triangle RenderableTri : TrianglesToRender)
@@ -745,10 +744,10 @@ public:
 public:
 	float GetDepthBufferAt(int x, int y)
 	{
-		if (x < 0) { return -1.0f; }
+		/*if (x < 0) { return -1.0f; }
 		if (y < 0) { return -1.0f; }
 		if (x > Camera->GetScreenWidth()) { return -1.0f; }
-		if (y > Camera->GetScreenHeight()) { return -1.0f; }
+		if (y > Camera->GetScreenHeight()) { return -1.0f; }*/
 		return DepthBuffer[x + (Camera->GetScreenWidth() * y)];
 	}
 

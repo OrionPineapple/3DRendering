@@ -8,6 +8,7 @@
 
 namespace InstanceHeirachy
 {
+    const int NULL_ID = -1;
 
 	struct InstanceSearchParameter
 	{
@@ -181,7 +182,7 @@ namespace InstanceHeirachy
 		bool CanHaveChildren = false;
 
         bool Locked = false;
-        int InstanceID = -1;
+        int InstanceID = NULL_ID;
         World* WorldReference = NULL;
 
 	protected:
@@ -241,6 +242,10 @@ namespace InstanceHeirachy
 			{
                 throw EngineException("Cannot set Parent to an Instance that cannot have children", "Attempt to set parent of " + Name + " as " + NewParent->GetName());
 			}
+            if (NewParent->IsDescendantOf(InstanceID))
+            {
+                throw EngineException("Cannot set a descendant of an Instance as its Parent", "Attemp to set parent of " + Name + " as it's descendant " + NewParent->GetName());
+            }
 
 			//parse through the current parents children and remove all references to self
 			//there only should be one, however double check for duplicates
@@ -315,6 +320,24 @@ namespace InstanceHeirachy
 			}
 			return Current;
 		}
+
+    public:
+
+        bool IsAncestorOf(int DescendantID)
+        {
+            return WorldReference->GetInstance(DescendantID)->IsDescendantOf(InstanceID);
+        }
+
+        bool IsDescendantOf(int AncestorID)
+        {
+            int NextIDToCheck = ParentID;
+            while (NextIDToCheck != NULL_ID)
+            {
+                if (NextIDToCheck == AncestorID) { return true; }
+                NextIDToCheck = WorldReference->GetInstance(NextIDToCheck)->GetParentID();
+            }
+            return false;
+        }
 
 	public:
 		static bool DoesInstanceMatchState(Instance* InstancePtr, InstanceSearchParameter& State)

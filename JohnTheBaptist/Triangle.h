@@ -18,11 +18,6 @@ protected:
 	Vector3D NormalB;
 	Vector3D NormalC;
 
-public:
-    bool OnePointer = false;
-    bool TwoPointerA = false;
-    bool TwoPointerB = false;
-
 private:
 	Triangle()
 	{

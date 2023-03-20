@@ -97,8 +97,8 @@ private:
         InstanceHeirachy::MeshInstance* MeshInstance = new InstanceHeirachy::MeshInstance
             (
                 World,
-                std::shared_ptr<Mesh>(new Mesh("Cube.obj")),
-                Matrix4x4::GetTranslationMatrix(Vector3D(0, 0, -10))
+                std::shared_ptr<Mesh>(new Mesh("TouranSmooth.obj")),
+                Matrix4x4::GetTranslationMatrix(Vector3D(0, -1, -10))
             );
         MeshInstance->SetParent(WorldRoot);
 
@@ -117,7 +117,7 @@ private:
 int main()
 {
 	UserProgram Program;
-	if (Program.Start("User Program", 1080, 1080)) 
+	if (Program.Start("User Program", 500, 500)) 
 	{
 		//Program Successfully Started
 	}
