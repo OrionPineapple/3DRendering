@@ -1,15 +1,15 @@
-
 #include "Engine.h"
 
 class UserProgram : public Engine
 {
 private:
     int Offset = 0;
+    Texture Tex;
 
 public:
 	UserProgram()
 	{
-
+        Tex = Texture("TextureTest.png");
 	}
 
 private:
@@ -84,6 +84,16 @@ private:
 	bool PostFrame(float DeltaTime) override
 	{
 		//After 3D Rendering
+
+        for (int y = 0; y < 400; y++)
+        {
+            for (int x = 0; x < 400; x++)
+            {
+                ColourRGB Colour = Tex.Get(x, y);
+                Draw(x, y, Colour);
+            }
+        }
+
 		return true;
 	}
 
@@ -97,7 +107,7 @@ private:
         InstanceHeirachy::MeshInstance* MeshInstance = new InstanceHeirachy::MeshInstance
             (
                 World,
-                std::shared_ptr<Mesh>(new Mesh("TouranSmooth.obj")),
+                std::shared_ptr<Mesh>(new Mesh("Cube.obj")),
                 Matrix4x4::GetTranslationMatrix(Vector3D(0, -1, -10))
             );
         MeshInstance->SetParent(WorldRoot);
@@ -117,7 +127,7 @@ private:
 int main()
 {
 	UserProgram Program;
-	if (Program.Start("User Program", 500, 500)) 
+	if (Program.Start("User Program", 400, 400)) 
 	{
 		//Program Successfully Started
 	}

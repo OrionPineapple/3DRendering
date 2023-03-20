@@ -2,6 +2,7 @@
 const float PI = 3.14159265359f;
 #include "EngineIO.h"
 #include "InstanceHeirachy.h"
+#include "Texture.h"
 #include <string>
 #include "Mesh.h"
 #include <mutex>
@@ -69,6 +70,13 @@ private:
         EngineController.Draw(x, y, olc::PixelF(r, g, b));
     }
 
+public:
+    void Draw(int x, int y, ColourRGB Colour)
+    {
+        EngineController.Draw(x, y, olc::PixelF((float)Colour.GetRed() / (float)255, (float)Colour.GetGreen() / (float)255, (float)Colour.GetBlue() / (float)255));
+    }
+
+private:
 	void Draw(int x, int y, float brightness)
 	{
 		//EngineController.Draw(x, y, olc::PixelF(brightness, brightness, brightness, 1.0f));

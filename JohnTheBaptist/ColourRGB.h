@@ -59,8 +59,31 @@ public:
 		return Blue;
 	}
 
-	static ColourRGB Interpolate(ColourRGB From, ColourRGB To, float Alpha)
+	static ColourRGB Interpolate(ColourRGB From, ColourRGB To, float Alpha, bool UseTrueInterpolation)
 	{
+        if (UseTrueInterpolation)
+        {
+            //an interpolation of two colours that accounts for their non linear values
+            //but still a correct and "true" linear intepolation
+            float FromR = From.Red * From.Red / 256.0f;
+            float FromG = From.Green * From.Green / 256.0f;
+            float FromB = From.Blue * From.Blue / 256.0f;
+
+            float ToR = To.Red * To.Red / 256.0f;
+            float ToG = To.Green * To.Green / 256.0f;
+            float ToB = To.Blue * To.Blue / 256.0f;
+
+            float EndR = FromR + Alpha * (ToR - FromR);
+            float EndG = FromG + Alpha * (ToG - FromG);
+            float EndB = FromB + Alpha * (ToB - FromB);
+
+            return ColourRGB(
+                (int)sqrtf(EndR),
+                (int)sqrtf(EndG),
+                (int)sqrtf(EndB));
+        }
+
+
 		//Legacy method of linear interpolation between colours
 		//only included because most applications do it this way
 		//this is wrong however because RGB values are not linear, they are rooted
@@ -68,28 +91,6 @@ public:
 			From.Red + Alpha * (To.Red - From.Red),
 			From.Green + Alpha * (To.Green - From.Green),
 			From.Blue + Alpha * (To.Blue - From.Blue));
-	}
-
-	static ColourRGB TrueInterpolate(ColourRGB From, ColourRGB To, float Alpha)
-	{
-		//an interpolation of two colours that accounts for their non linear values
-		//but still a correct and "true" linear intepolation
-		float FromR = From.Red * From.Red / 256.0f;
-		float FromG = From.Green * From.Green / 256.0f;
-		float FromB = From.Blue * From.Blue / 256.0f;
-
-		float ToR = To.Red * To.Red / 256.0f;
-		float ToG = To.Green * To.Green / 256.0f;
-		float ToB = To.Blue * To.Blue / 256.0f;
-
-		float EndR = FromR + Alpha * (ToR - FromR);
-		float EndG = FromG + Alpha * (ToG - FromG);
-		float EndB = FromB + Alpha * (ToB - FromB);
-
-		return ColourRGB(
-			(int)sqrtf(EndR),
-			(int)sqrtf(EndG),
-			(int)sqrtf(EndB));
 	}
 
 	static ColourRGB GetMininum(ColourRGB A, ColourRGB B)
