@@ -653,7 +653,7 @@ private:
             std::vector<InstanceHeirachy::Plane> CullingPlanes = Camera->GetCullingPlanes(InverseTransform, InverseRotate);
 
             std::shared_ptr<Mesh> MeshRef = MeshToRender->GetReferenceToMesh();
-            std::vector<std::shared_ptr<Triangle>> TriangleArray = MeshRef->GetTriangleReferences();
+            std::vector<std::shared_ptr<Triangle>> TriangleArray = *(MeshRef->GetTriangleReferences());
             for (int i = 0; i < TriangleArray.size(); i++)
             {
                 std::shared_ptr<Triangle> Tri = TriangleArray[i];
@@ -698,6 +698,11 @@ public:
 	virtual bool OnDestroy() { return true; };
 
 public:
+    float GetRunTime()
+    {
+        return RunTime;
+    }
+
 	void AlterScreen(int NewHeight, int NewWidth)
 	{
 		EngineController.SetScreenSize(NewHeight, NewWidth);

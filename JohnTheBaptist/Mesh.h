@@ -5,6 +5,7 @@
 #include "Vector2D.h"
 #include "Matrix4x4.h"
 #include "Point.h"
+#include "ColourRGB.h"
 #include "Texture.h"
 #include "Triangle.h"
 #include <iostream>
@@ -297,14 +298,14 @@ public:
 	}
 
 public:
-    std::vector<std::shared_ptr<Point>> GetPointReferences()
+    std::vector<std::shared_ptr<Point>>* GetPointReferences()
     {
-        return std::vector<std::shared_ptr<Point>>(PointArray);
+        return &PointArray;
     }
 
-    std::vector<std::shared_ptr<Triangle>> GetTriangleReferences()
+    std::vector<std::shared_ptr<Triangle>>* GetTriangleReferences()
     {
-        return std::vector<std::shared_ptr<Triangle>>(TriangleArray);
+        return &TriangleArray;
     }
 
 public://temporary -> use MatrixInstance as that has reference to centre point

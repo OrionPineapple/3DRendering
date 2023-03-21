@@ -5,17 +5,18 @@
 #include "Instance.h"
 #include "Folder.h"
 
-//Matrix Based
-#include "MatrixInstance.h"
-#include "MeshInstance.h"
-#include "Subworld.h"
-#include "Camera.h"
-
 //Lighting Based
 #include "Light.h"
 #include "PointLight.h"
 #include "DirectionalLight.h"
 #include "AmbientLight.h"
+
+//Matrix Based
+#include "MatrixInstance.h"
+#include "MeshInstance.h"
+#include "Camera.h"
+#include "Subworld.h"
+
 
 namespace InstanceHeirachy
 {
@@ -24,6 +25,7 @@ namespace InstanceHeirachy
         MeshInstance* MeshRef = NULL;
         Folder* FoldRef = NULL;
         Camera* CamRef = NULL;
+        SubWorld* SubWorldRef = NULL;
 
         switch (Ref->GetType())
         {
@@ -43,7 +45,9 @@ namespace InstanceHeirachy
             delete MeshRef;
             break;
         case InstanceType::SubWorldType:
-            throw EngineException("Unhandled instance type", "Need to implement deletion for this pointer type");
+            SubWorldRef = dynamic_cast<SubWorld*>(Ref);
+            Ref = NULL;
+            delete SubWorldRef;
             break;
         case InstanceType::FolderType:
             FoldRef = dynamic_cast<Folder*>(Ref);

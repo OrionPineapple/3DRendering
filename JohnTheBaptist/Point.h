@@ -67,6 +67,11 @@ public:
 		return WorldPoint;
 	}
 
+    void SetPosition(Vector3D Position)
+    {
+        WorldPoint = Position;
+    }
+
 	Vector2D GetTexturePoint()
 	{
         return TexturePoint;

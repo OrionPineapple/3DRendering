@@ -1,5 +1,12 @@
 #pragma once
+#include "Light.h"
+#include "PointLight.h"
+#include "DirectionalLight.h"
+#include "AmbientLight.h"
+
+//Matrix Based
 #include "MatrixInstance.h"
+#include "MeshInstance.h"
 
 namespace InstanceHeirachy
 {
