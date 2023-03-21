@@ -1,11 +1,12 @@
+//
 //#include "Engine.h"
 //
 //class UserProgram : public Engine
 //{
 //private:
-//    int Width = 500;
-//    int Length = 500;
-//    float Seperation = 0.1f;
+//    int Width = 70;
+//    int Length = 70;
+//    float Seperation = 0.04f;
 //    InstanceHeirachy::MeshInstance* MeshInstance;
 //
 //public:
@@ -65,15 +66,15 @@
 //        {
 //            Camera->Translate(CameraRotationMatrix * Vector3D(0, 0, DeltaTime));
 //        }
-//        
 //
-//        
+//
+//
 //        std::vector<std::shared_ptr<Point>>* VectorOfPoints = MeshInstance->GetReferenceToMesh().get()->GetPointReferences();
 //        for (int x = 0; x < Width; x++)
 //        {
-//            for(int y = 0; y < Height; y++)
+//            for (int y = 0; y < Length; y++)
 //            {
-//                float Displacement = sinf(x + y + t);
+//                float Displacement = 0.09f * sinf(0.15f * x + 0.08f * y + GetRunTime());
 //                Vector3D Position = Vector3D((float)x * Seperation, Displacement, (float)y * Seperation);
 //                VectorOfPoints->at(x + (y * Width)).get()->SetPosition(Position);
 //            }
@@ -93,40 +94,42 @@
 //
 //        InstanceHeirachy::World* World = GetWorld();
 //        InstanceHeirachy::Instance* WorldRoot = GetWorldRoot();
+//        InstanceHeirachy::Camera* Camera = GetCamera();
+//        Camera->SetMatrix(Matrix4x4::GetRotationMatrix(Vector3D(0, PI, 0)) * Matrix4x4::GetTranslationMatrix(Vector3D(0.0f, 2.0f, 2.0f)));
 //
 //        Mesh* PlanarMesh = new Mesh();
 //        std::vector<std::shared_ptr<Point>>* VectorOfPoints = PlanarMesh->GetPointReferences();
 //        std::vector<std::shared_ptr<Triangle>>* VectorOfTriangles = PlanarMesh->GetTriangleReferences();
 //
-//    
+//
 //        for (int x = 0; x < Width; x++)
 //        {
-//            for(int y = 0; y < Height; y++)
+//            for (int y = 0; y < Length; y++)
 //            {
 //                Vector3D Position = Vector3D((float)x * Seperation, 0, (float)y * Seperation);
-//                VectorOfPoints->push_back(std::shared_ptr<Point>>(new Point(Position)));
+//                VectorOfPoints->push_back(std::shared_ptr<Point>(new Point(Position)));
 //            }
 //        }
 //
 //        for (int x = 0; x < Width - 1; x++)
 //        {
-//            for(int y = 0; y < Height - 1; y++)
+//            for (int y = 0; y < Length - 1; y++)
 //            {
-//                std::shared_ptr<Point>> A = VectorOfPoints->at((x) + (y * Width));
-//                std::shared_ptr<Point>> B = VectorOfPoints->at((x+ 1) + (y * Width));
-//                std::shared_ptr<Point>> C = VectorOfPoints->at((x) + ((y+1) * Width));
-//                VectorOfTriangles->push_back(std::shared_ptr<Triangle>>(new Triangle(A, B, C)))
+//                std::shared_ptr<Point> C = VectorOfPoints->at((x)+(y * Width));
+//                std::shared_ptr<Point> B = VectorOfPoints->at((x + 1) + (y * Width));
+//                std::shared_ptr<Point> A = VectorOfPoints->at((x)+((y + 1) * Width));
+//                VectorOfTriangles->push_back(std::shared_ptr<Triangle>(new Triangle(A, B, C)));
 //            }
 //        }
 //
 //        for (int x = 0; x < Width - 1; x++)
 //        {
-//            for(int y = 0; y < Height - 1; y++)
+//            for (int y = 0; y < Length - 1; y++)
 //            {
-//                std::shared_ptr<Point>> A = VectorOfPoints->at((x+1) + (y * Width));
-//                std::shared_ptr<Point>> B = VectorOfPoints->at((x+ 1) + ((y+1) * Width));
-//                std::shared_ptr<Point>> C = VectorOfPoints->at((x) + ((y+1) * Width));
-//                VectorOfTriangles->push_back(std::shared_ptr<Triangle>>(new Triangle(A, B, C)))
+//                std::shared_ptr<Point> C = VectorOfPoints->at((x + 1) + (y * Width));
+//                std::shared_ptr<Point> B = VectorOfPoints->at((x + 1) + ((y + 1) * Width));
+//                std::shared_ptr<Point> A = VectorOfPoints->at((x)+((y + 1) * Width));
+//                VectorOfTriangles->push_back(std::shared_ptr<Triangle>(new Triangle(A, B, C)));
 //            }
 //        }
 //
@@ -152,7 +155,7 @@
 //int main()
 //{
 //    UserProgram Program;
-//    if (Program.Start("User Program", 800, 500))
+//    if (Program.Start("3D Wave Test", 800, 800))
 //    {
 //        //Program Successfully Started
 //    }

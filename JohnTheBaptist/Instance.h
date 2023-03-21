@@ -169,23 +169,23 @@ namespace InstanceHeirachy
         }
 	};
 
-	class Instance
-	{
-	protected:
-		std::string Name;
-		int ParentID = -1;
-		std::vector<int> ChildrenIDs;
-		bool Enabled = true;
+    class Instance
+    {
+    protected:
+        std::string Name;
+        int ParentID = -1;
+        std::vector<int> ChildrenIDs;
+        bool Enabled = true;
 
-		InstanceBaseType BaseType;
-		InstanceType Type;
-		bool CanHaveChildren = false;
+        InstanceBaseType BaseType;
+        InstanceType Type;
+        bool CanHaveChildren = false;
 
         bool Locked = false;
         int InstanceID = NULL_ID;
         World* WorldReference = NULL;
 
-	protected:
+    protected:
         void Register(World* WorldRef)
         {
             int ID = WorldRef->RegisterInstance(this);
@@ -212,43 +212,43 @@ namespace InstanceHeirachy
         }
 
         virtual void OutputName() { std::cout << Name; };
-		std::string GetName()
-		{
-			return Name;
-		}
+        std::string GetName()
+        {
+            return Name;
+        }
 
-		void SetName(std::string NewName)
-		{
-			Name = NewName;
-		}
+        void SetName(std::string NewName)
+        {
+            Name = NewName;
+        }
 
         int GetInstanceID()
         {
             return InstanceID;
         }
 
-		int GetParentID()
-		{
-			return ParentID;
-		}
+        int GetParentID()
+        {
+            return ParentID;
+        }
 
         Instance* GetParent()
         {
             return WorldReference->GetInstance(ParentID);
         }
 
-		bool SetParent(Instance* NewParent)
-		{
-			if (NewParent == NULL)
-			{
+        bool SetParent(Instance* NewParent)
+        {
+            if (NewParent == NULL)
+            {
                 throw EngineException("Cannot set Parent to a NULL Instance", "Attempt to set parent of " + Name + " but that instance does not exist");
                 return false;
-			}
-			if (!NewParent->CanHaveChildren)
-			{
+            }
+            if (!NewParent->CanHaveChildren)
+            {
                 throw EngineException("Cannot set Parent to an Instance that cannot have children", "Attempt to set parent of " + Name + " as " + NewParent->GetName());
                 return false;
-			}
+            }
             if (NewParent->IsDescendantOf(InstanceID))
             {
                 throw EngineException("Cannot set a descendant of an Instance as its Parent", "Attemp to set parent of " + Name + " as it's descendant " + NewParent->GetName());
@@ -260,8 +260,8 @@ namespace InstanceHeirachy
                 return false;
             }
 
-			//parse through the current parents children and remove all references to self
-			//there only should be one, however double check for duplicates
+            //parse through the current parents children and remove all references to self
+            //there only should be one, however double check for duplicates
             if (ParentID != -1)
             {
                 Instance* ParentRef = GetParent();
@@ -273,9 +273,29 @@ namespace InstanceHeirachy
             }
 
             ParentID = NewParent->InstanceID;
-			NewParent->ChildrenIDs.push_back(InstanceID);
-			return true;
-		}
+            NewParent->ChildrenIDs.push_back(InstanceID);
+            return true;
+        }
+
+        void Destroy()
+        {
+            if (ParentID != -1)
+            {
+                Instance* ParentRef = GetParent();
+                std::vector<int>::iterator pos = std::find(ParentRef->ChildrenIDs.begin(), ParentRef->ChildrenIDs.end(), InstanceID);
+                if (pos != ParentRef->ChildrenIDs.end())
+                {
+                    ParentRef->ChildrenIDs.erase(pos);
+                }
+            }
+
+            for (Instance* Ref : GetChildren())
+            {
+                Ref->Destroy();
+            }
+
+            WorldReference->DeleteInstance(InstanceID);
+        }
 
         std::vector<int> GetChildrenIDs()
         {

@@ -3,15 +3,13 @@
 //class UserProgram : public Engine
 //{
 //private:
-//    int Width = 500;
-//    int Length = 500;
-//    float Seperation = 0.1f;
-//    InstanceHeirachy::MeshInstance* MeshInstance;
+//    int Offset = 0;
+//    Texture Tex;
 //
 //public:
 //    UserProgram()
 //    {
-//
+//        //Tex = Texture("TextureTest.png");
 //    }
 //
 //private:
@@ -65,24 +63,64 @@
 //        {
 //            Camera->Translate(CameraRotationMatrix * Vector3D(0, 0, DeltaTime));
 //        }
-//        
 //
-//        
-//        std::vector<std::shared_ptr<Point>>* VectorOfPoints = MeshInstance->GetReferenceToMesh().get()->GetPointReferences();
-//        for (int x = 0; x < Width; x++)
+//        InstanceHeirachy::World* World = GetWorld();
+//        InstanceHeirachy::Instance* WorldRoot = GetWorldRoot();
+//
+//        if (IsKeyPressed(olc::Key::SPACE))
 //        {
-//            for(int y = 0; y < Height; y++)
-//            {
-//                float Displacement = sinf(x + y + t);
-//                Vector3D Position = Vector3D((float)x * Seperation, Displacement, (float)y * Seperation);
-//                VectorOfPoints->at(x + (y * Width)).get()->SetPosition(Position);
-//            }
+//            Offset += 5;
+//
+//            InstanceHeirachy::MeshInstance* MeshInstance = new InstanceHeirachy::MeshInstance
+//            (
+//                World,
+//                std::shared_ptr<Mesh>(new Mesh("TouranSmooth.obj")),
+//                Camera->GetMatrix() * Matrix4x4::GetTranslationMatrix(Vector3D(0.0f, -1.0f, -5.0f)) * Matrix4x4::GetRotationMatrix(Vector3D(0, 0, 0))
+//            );
+//            MeshInstance->SetParent(WorldRoot);
 //        }
+//
+//        if (IsKeyPressed(olc::Key::F))
+//        {
+//            Vector3D CamPos = Camera->ExtractVectorPosition();
+//            InstanceHeirachy::InstanceSearchParameter Search = InstanceHeirachy::InstanceSearchParameter();
+//            Search.SetType(InstanceHeirachy::InstanceType::MeshInstanceType);
+//            Search.SetEnabled(true);
+//            std::vector<InstanceHeirachy::Instance*> EnabledMeshChildren = WorldRoot->GetAllChildMatchingState(Search);
+//
+//            if (EnabledMeshChildren.size() >= 1)
+//            {
+//                InstanceHeirachy::MeshInstance* ClosestMesh = dynamic_cast<InstanceHeirachy::MeshInstance*>(EnabledMeshChildren.at(0));
+//                float Distance = 1000000.0f;
+//                for (InstanceHeirachy::Instance* Instance : EnabledMeshChildren)
+//                {
+//                    InstanceHeirachy::MeshInstance* Mesh = dynamic_cast<InstanceHeirachy::MeshInstance*>(Instance);
+//                    float CompDistance = (Mesh->ExtractVectorPosition() - CamPos).GetMagnitude();
+//                    if (CompDistance < Distance)
+//                    {
+//                        Distance = CompDistance;
+//                        ClosestMesh = Mesh;
+//                    }
+//                }
+//                ClosestMesh->Destroy();
+//            }
+//
+//        }
+//
 //    }
 //
 //    bool PostFrame(float DeltaTime) override
 //    {
 //        //After 3D Rendering
+//
+//        /*for (int y = 0; y < 400; y++)
+//        {
+//            for (int x = 0; x < 400; x++)
+//            {
+//                ColourRGB Colour = Tex.Get(x, y);
+//                Draw(x, y, Colour);
+//            }
+//        }*/
 //
 //        return true;
 //    }
@@ -93,47 +131,14 @@
 //
 //        InstanceHeirachy::World* World = GetWorld();
 //        InstanceHeirachy::Instance* WorldRoot = GetWorldRoot();
+//        InstanceHeirachy::Camera* Camera = GetCamera();
+//        Camera->SetMatrix(Matrix4x4::GetRotationMatrix(Vector3D(0, 0, 0)) * Matrix4x4::GetTranslationMatrix(Vector3D(0.0f, 1.0f, 5.0f)));
 //
-//        Mesh* PlanarMesh = new Mesh();
-//        std::vector<std::shared_ptr<Point>>* VectorOfPoints = PlanarMesh->GetPointReferences();
-//        std::vector<std::shared_ptr<Triangle>>* VectorOfTriangles = PlanarMesh->GetTriangleReferences();
-//
-//    
-//        for (int x = 0; x < Width; x++)
-//        {
-//            for(int y = 0; y < Height; y++)
-//            {
-//                Vector3D Position = Vector3D((float)x * Seperation, 0, (float)y * Seperation);
-//                VectorOfPoints->push_back(std::shared_ptr<Point>>(new Point(Position)));
-//            }
-//        }
-//
-//        for (int x = 0; x < Width - 1; x++)
-//        {
-//            for(int y = 0; y < Height - 1; y++)
-//            {
-//                std::shared_ptr<Point>> A = VectorOfPoints->at((x) + (y * Width));
-//                std::shared_ptr<Point>> B = VectorOfPoints->at((x+ 1) + (y * Width));
-//                std::shared_ptr<Point>> C = VectorOfPoints->at((x) + ((y+1) * Width));
-//                VectorOfTriangles->push_back(std::shared_ptr<Triangle>>(new Triangle(A, B, C)))
-//            }
-//        }
-//
-//        for (int x = 0; x < Width - 1; x++)
-//        {
-//            for(int y = 0; y < Height - 1; y++)
-//            {
-//                std::shared_ptr<Point>> A = VectorOfPoints->at((x+1) + (y * Width));
-//                std::shared_ptr<Point>> B = VectorOfPoints->at((x+ 1) + ((y+1) * Width));
-//                std::shared_ptr<Point>> C = VectorOfPoints->at((x) + ((y+1) * Width));
-//                VectorOfTriangles->push_back(std::shared_ptr<Triangle>>(new Triangle(A, B, C)))
-//            }
-//        }
-//
-//        MeshInstance = new InstanceHeirachy::MeshInstance
+//        InstanceHeirachy::MeshInstance* MeshInstance = new InstanceHeirachy::MeshInstance
 //        (
 //            World,
-//            std::shared_ptr<Mesh>(PlanarMesh)
+//            std::shared_ptr<Mesh>(new Mesh("TouranSmooth.obj")),
+//            Matrix4x4::GetTranslationMatrix(Vector3D(0, 0, 0))
 //        );
 //        MeshInstance->SetParent(WorldRoot);
 //
@@ -152,7 +157,7 @@
 //int main()
 //{
 //    UserProgram Program;
-//    if (Program.Start("User Program", 800, 500))
+//    if (Program.Start("User Program", 400, 400))
 //    {
 //        //Program Successfully Started
 //    }
@@ -162,3 +167,5 @@
 //    }
 //    return 0;
 //}
+//
+//

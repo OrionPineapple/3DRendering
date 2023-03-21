@@ -79,8 +79,9 @@ public:
 private:
 	void Draw(int x, int y, float brightness)
 	{
-		//EngineController.Draw(x, y, olc::PixelF(brightness, brightness, brightness, 1.0f));
-		EngineController.Draw(x, y, olc::PixelF(1.0f - brightness, brightness, 0.5f + brightness * 0.5f, 1.0f));
+        //EngineController.Draw(x, y, olc::PixelF(1.0f, brightness, brightness, 1.0f));
+		EngineController.Draw(x, y, olc::PixelF(brightness, brightness, brightness, 1.0f));
+		//EngineController.Draw(x, y, olc::PixelF(1.0f - brightness, brightness, 0.5f + brightness * 0.5f, 1.0f));
 	}
 
 	float Interpolate(float from, float to, float alpha)
@@ -363,7 +364,8 @@ private:
 		}
 		else
 		{
-			ToLight = Vector3D::Normalise(Camera->ExtractVectorPosition() - Centre);
+			//ToLight = Vector3D::Normalise(Camera->ExtractVectorPosition() - Centre);
+            ToLight = Vector3D::Normalise(Vector3D(2, 2, 2));
 			float light_value = Vector3D::Dot(ToLight, Normal);
 			if (light_value < 0.1f) { light_value = 0.1f; }
 			FillTriangle(Tri, A, B, C, light_value);
@@ -510,13 +512,12 @@ private:
             }
             else
             {
-                Triangle NewTri = Triangle(Tri.GetPointA(), Tri.GetPointB(), std::shared_ptr<Point>(new Point(Y)));
+                Triangle NewTri = Triangle(std::shared_ptr<Point>(new Point(A)), std::shared_ptr<Point>(new Point(B)), std::shared_ptr<Point>(new Point(Y)));
+
+                Triangle NewTri2 = Triangle(std::shared_ptr<Point>(new Point(Y)), std::shared_ptr<Point>(new Point(X)), std::shared_ptr<Point>(new Point(A)));
 
                 Triangles.push_back(NewTri);
-
-                Triangle NewTri2 = Triangle(std::shared_ptr<Point>(new Point(Y)), std::shared_ptr<Point>(new Point(X)), Tri.GetPointA());
-
-                Triangles.push_back(NewTri);
+                Triangles.push_back(NewTri2);
             }
         }
         else if (CA < 0.0f || CA > 1.0f)
@@ -540,12 +541,11 @@ private:
             }
             else
             {
-                Triangle NewTri = Triangle(Tri.GetPointC(), Tri.GetPointA(), std::shared_ptr<Point>(new Point (Y)));
+                Triangle NewTri = Triangle(std::shared_ptr<Point>(new Point(C)), std::shared_ptr<Point>(new Point(A)), std::shared_ptr<Point>(new Point(Y)));
+
+                Triangle NewTri2 = Triangle(std::shared_ptr<Point>(new Point(Y)), std::shared_ptr<Point>(new Point(X)), std::shared_ptr<Point>(new Point(C)));
 
                 Triangles.push_back(NewTri);
-
-                Triangle NewTri2 = Triangle(std::shared_ptr<Point>(new Point(Y)), std::shared_ptr<Point>(new Point(X)), Tri.GetPointC());
-
                 Triangles.push_back(NewTri2);
             }
         }
@@ -569,12 +569,10 @@ private:
             }
             else
             {
-                Triangle NewTri = Triangle(Tri.GetPointB(), Tri.GetPointC(), std::shared_ptr<Point>(new Point(Y)));
+                Triangle NewTri = Triangle(std::shared_ptr<Point>(new Point(B)), std::shared_ptr<Point>(new Point(C)), std::shared_ptr<Point>(new Point(Y)));
+                Triangle NewTri2 = Triangle(std::shared_ptr<Point>(new Point(Y)), std::shared_ptr<Point>(new Point(X)), std::shared_ptr<Point>(new Point(B)));
 
                 Triangles.push_back(NewTri);
-
-                Triangle NewTri2 = Triangle(std::shared_ptr<Point>(new Point(Y)), std::shared_ptr<Point>(new Point(X)), Tri.GetPointB());
-
                 Triangles.push_back(NewTri2);
             }
         }
