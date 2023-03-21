@@ -149,6 +149,7 @@
     <ClInclude Include="Instance.h" />
     <ClInclude Include="InstanceHeirachy.h" />
     <ClInclude Include="Light.h" />
+    <ClInclude Include="Material.h" />
     <ClInclude Include="Matrix4x4.h" />
     <ClInclude Include="MatrixInstance.h" />
     <ClInclude Include="Mesh.h" />

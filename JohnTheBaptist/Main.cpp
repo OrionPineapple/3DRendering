@@ -9,7 +9,7 @@ private:
 public:
 	UserProgram()
 	{
-        //Tex = Texture("TextureTest.png");
+
 	}
 
 private:
@@ -63,64 +63,11 @@ private:
         {
             Camera->Translate(CameraRotationMatrix * Vector3D(0, 0, DeltaTime));
         }
-
-        InstanceHeirachy::World* World = GetWorld();
-        InstanceHeirachy::Instance* WorldRoot = GetWorldRoot();
-
-        if (IsKeyPressed(olc::Key::SPACE))
-        {
-            Offset += 5;
-
-            InstanceHeirachy::MeshInstance* MeshInstance = new InstanceHeirachy::MeshInstance
-            (
-                World,
-                std::shared_ptr<Mesh>(new Mesh("TouranSmooth.obj")),
-                Camera->GetMatrix() * Matrix4x4::GetTranslationMatrix(Vector3D(0.0f, -1.0f, -5.0f)) * Matrix4x4::GetRotationMatrix(Vector3D(0, 0, 0))
-            );
-            MeshInstance->SetParent(WorldRoot);
-        }
-
-        if (IsKeyPressed(olc::Key::F))
-        {
-            Vector3D CamPos = Camera->ExtractVectorPosition();
-            InstanceHeirachy::InstanceSearchParameter Search = InstanceHeirachy::InstanceSearchParameter();
-            Search.SetType(InstanceHeirachy::InstanceType::MeshInstanceType);
-            Search.SetEnabled(true);
-            std::vector<InstanceHeirachy::Instance*> EnabledMeshChildren = WorldRoot->GetAllChildMatchingState(Search);
-
-            if (EnabledMeshChildren.size() >= 1)
-            {
-                InstanceHeirachy::MeshInstance* ClosestMesh = dynamic_cast<InstanceHeirachy::MeshInstance*>(EnabledMeshChildren.at(0));
-                float Distance = 1000000.0f;
-                for (InstanceHeirachy::Instance* Instance : EnabledMeshChildren)
-                {
-                    InstanceHeirachy::MeshInstance* Mesh = dynamic_cast<InstanceHeirachy::MeshInstance*>(Instance);
-                    float CompDistance = (Mesh->ExtractVectorPosition() - CamPos).GetMagnitude();
-                    if (CompDistance < Distance)
-                    {
-                        Distance = CompDistance;
-                        ClosestMesh = Mesh;
-                    }
-                }
-                ClosestMesh->Destroy();
-            }
-
-        }
-
     }
 
 	bool PostFrame(float DeltaTime) override
 	{
 		//After 3D Rendering
-
-        /*for (int y = 0; y < 400; y++)
-        {
-            for (int x = 0; x < 400; x++)
-            {
-                ColourRGB Colour = Tex.Get(x, y);
-                Draw(x, y, Colour);
-            }
-        }*/
 
 		return true;
 	}
@@ -132,13 +79,13 @@ private:
         InstanceHeirachy::World* World = GetWorld();
         InstanceHeirachy::Instance* WorldRoot = GetWorldRoot();
         InstanceHeirachy::Camera* Camera = GetCamera();
-        Camera->SetMatrix(Matrix4x4::GetRotationMatrix(Vector3D(0, 0, 0)) * Matrix4x4::GetTranslationMatrix(Vector3D(0.0f, 1.0f, 5.0f)));
+        Camera->SetMatrix(Matrix4x4::GetRotationMatrix(Vector3D(0, 0, 0)) * Matrix4x4::GetTranslationMatrix(Vector3D(0.0f, 5.0f, 100.0f)));
 
         InstanceHeirachy::MeshInstance* MeshInstance = new InstanceHeirachy::MeshInstance
             (
                 World,
-                std::shared_ptr<Mesh>(new Mesh("TouranSmooth.obj")),
-                Matrix4x4::GetTranslationMatrix(Vector3D(0, 0, 0))
+                std::shared_ptr<Mesh>(new Mesh("BattleShip.obj")),
+                Matrix4x4::GetRotationMatrix(Vector3D(0, 0, 0))
             );
         MeshInstance->SetParent(WorldRoot);
 

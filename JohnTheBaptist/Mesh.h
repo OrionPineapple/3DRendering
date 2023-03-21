@@ -12,6 +12,7 @@
 #include <fstream>
 #include <strstream>
 #include <fstream>
+#include "Material.h"
 
 class Mesh
 {

@@ -4,6 +4,7 @@
 #include "Matrix4x4.h"
 #include "Point.h"
 #include "Texture.h"
+#include "Material.h"
 #include <mutex>
 
 class Triangle
@@ -74,6 +75,11 @@ public:
         return DiffuseColour;
     }
 
+    Material GetMaterial()
+    {
+        return Material(AmbientColour, DiffuseColour, SpecularColour);
+    }
+
     void SetAmbient(ColourRGB NewAmbient)
     {
         AmbientColour = NewAmbient;
@@ -87,6 +93,13 @@ public:
     void SetDiffuse(ColourRGB NewDiffuse)
     {
         DiffuseColour = NewDiffuse;
+    }
+
+    void SetMaterial(Material Matt)
+    {
+        SetAmbient(Matt.GetAmbient());
+        SetSpecular(Matt.GetSpecular());
+        SetDiffuse(Matt.GetDiffuse());
     }
 
     std::shared_ptr<Texture> GetTexture()
