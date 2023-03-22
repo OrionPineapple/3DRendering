@@ -80,6 +80,7 @@ public:
                 CurrentKey = line.substr(7, line.size() - 7);
             }
         }
+        MaterialMap[CurrentKey] = CurrentMaterial;
         FileInput.close();
     }
 

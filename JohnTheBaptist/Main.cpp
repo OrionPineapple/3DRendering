@@ -4,7 +4,6 @@ class UserProgram : public Engine
 {
 private:
     int Offset = 0;
-    Texture Tex;
 
 public:
 	UserProgram()
@@ -79,15 +78,18 @@ private:
         InstanceHeirachy::World* World = GetWorld();
         InstanceHeirachy::Instance* WorldRoot = GetWorldRoot();
         InstanceHeirachy::Camera* Camera = GetCamera();
-        Camera->SetMatrix(Matrix4x4::GetRotationMatrix(Vector3D(0, 0, 0)) * Matrix4x4::GetTranslationMatrix(Vector3D(0.0f, 5.0f, 100.0f)));
+        Camera->SetMatrix(Matrix4x4::GetRotationMatrix(Vector3D(0, 0, 0)) * Matrix4x4::GetTranslationMatrix(Vector3D(0.0f, 0.0f, 5.0f)));
 
-        InstanceHeirachy::MeshInstance* MeshInstance = new InstanceHeirachy::MeshInstance
+        for (int i = 0; i < 10; i++)
+        {
+            InstanceHeirachy::MeshInstance* MeshInstance = new InstanceHeirachy::MeshInstance
             (
                 World,
-                std::shared_ptr<Mesh>(new Mesh("BattleShip.obj")),
-                Matrix4x4::GetRotationMatrix(Vector3D(0, 0, 0))
+                std::shared_ptr<Mesh>(new Mesh("TreeLowPoly.obj")),
+                Matrix4x4::GetTranslationMatrix(Vector3D(0, 0, i * 4.0f))
             );
-        MeshInstance->SetParent(WorldRoot);
+            MeshInstance->SetParent(WorldRoot);
+        }
 
 		return true;
 	}

@@ -134,14 +134,14 @@ private:
 			FillTriangleFromFlat(
 				x_a, y_a, z_a, 
 				x_b, y_b, z_b, 
-				x_c, y_c, z_c, q);
+				x_c, y_c, z_c, q, ProjectedTriangle);
 		}
 		else if (y_b == y_c)
 		{
 			FillTriangleFromFlat(
 				x_c, y_c, z_c,
 				x_b, y_b, z_b,
-				x_a, y_a, z_a, q);
+				x_a, y_a, z_a, q, ProjectedTriangle);
 		}
 		else 
 		{
@@ -155,11 +155,11 @@ private:
 			FillTriangleFromFlat(
 				x_k, y_k, z_k,
 				x_b, y_b, z_b,
-				x_a, y_a, z_a, q);
+				x_a, y_a, z_a, q, ProjectedTriangle);
 			FillTriangleFromFlat(
 				x_b, y_b, z_b,
 				x_k, y_k, z_k,
-				x_c, y_c, z_c, q);
+				x_c, y_c, z_c, q, ProjectedTriangle);
 			//b,k is inline
 		}
 
@@ -221,7 +221,7 @@ private:
 				x_a, y_a, z_a, NA,
 				x_b, y_b, z_b, NB,
 				x_c, y_c, z_c, NC,
-				LightDirection);
+				LightDirection, ProjectedTriangle);
 		}
 		else if (y_b == y_c)
 		{
@@ -229,7 +229,7 @@ private:
 				x_c, y_c, z_c, NC,
 				x_b, y_b, z_b, NB,
 				x_a, y_a, z_a, NA,
-				LightDirection);
+				LightDirection, ProjectedTriangle);
 		}
 		else
 		{
@@ -245,18 +245,18 @@ private:
 				x_k, y_k, z_k, NK,
 				x_b, y_b, z_b, NB,
 				x_a, y_a, z_a, NA,
-				LightDirection);
+				LightDirection, ProjectedTriangle);
 			FillTriangleFromFlatWithNormals(
 				x_b, y_b, z_b, NB,
 				x_k, y_k, z_k, NK,
 				x_c, y_c, z_c, NC,
-				LightDirection);
+				LightDirection, ProjectedTriangle);
 
 			//b,k is inline
 		}
 	}
 
-	void FillTriangleFromFlatWithNormals(int& x_a, int& y_a, float& z_a, Vector3D& NA, int& x_b, int& y_b, float& z_b, Vector3D& NB, int& x_c, int& y_c, float& z_c, Vector3D& NC, Vector3D& LightDirection)
+	void FillTriangleFromFlatWithNormals(int& x_a, int& y_a, float& z_a, Vector3D& NA, int& x_b, int& y_b, float& z_b, Vector3D& NB, int& x_c, int& y_c, float& z_c, Vector3D& NC, Vector3D& LightDirection, Triangle& Tri)
 	{
 		//y_a == y_b
 		int direction_y = 1;
@@ -295,7 +295,7 @@ private:
 					if (q < 0.1f) { q = 0.1f; }
 
 					SetDepthBufferAt(x, y, z);
-					Draw(x, y, q);
+					Draw(x, y, Tri.GetMaterial().GetDiffuse());
 				}
 			}
 		}
@@ -313,7 +313,7 @@ private:
 		}
 	}
 
-	void FillTriangleFromFlat(int x_a, int y_a, float z_a, int x_b, int y_b, float z_b, int x_c, int y_c, float z_c, float q)
+	void FillTriangleFromFlat(int x_a, int y_a, float z_a, int x_b, int y_b, float z_b, int x_c, int y_c, float z_c, float q, Triangle& Tri)
 	{
 		//y_a == y_b
 		int direction_y = 1;
@@ -346,7 +346,7 @@ private:
 				if (GetDepthBufferAt(x, y) > z)
 				{
 					SetDepthBufferAt(x, y, z);
-					Draw(x, y, q);
+					Draw(x, y, Tri.GetMaterial().GetDiffuse());
 				}
 			}
 		}
@@ -673,6 +673,7 @@ private:
 
                 for (Triangle RenderableTri : TrianglesToRender)
                 {
+                    RenderableTri.SetMaterial(Tri->GetMaterial());
                     ProjectAndDraw(RenderableTri, FinalProjection, InverseRotate, Normal, RenderableTri.GetCentre());
                 }
 

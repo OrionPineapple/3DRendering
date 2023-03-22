@@ -80,6 +80,8 @@ public:
 		FileInput.open(ObjFileName, std::ios::in);
 
 		std::vector<Vector3D> NormalData;
+        std::map<std::string, Material> MaterialData;
+        Material CurrentMatt;
 
 		while (FileInput) {
 			std::getline(FileInput, line);
@@ -148,6 +150,7 @@ public:
 								PointArray[p2 - 1],
 								PointArray[p3 - 1])));
 					}
+                    TriangleArray.at(TriangleArray.size() - 1)->SetMaterial(CurrentMatt);
 				}
 
 				else if (FaceData.size() == 4)
@@ -204,6 +207,8 @@ public:
 								PointArray[p4 - 1],
 								PointArray[p1 - 1])));
 					}
+                    TriangleArray.at(TriangleArray.size() - 1)->SetMaterial(CurrentMatt);
+                    TriangleArray.at(TriangleArray.size() - 2)->SetMaterial(CurrentMatt);
 				}
 
 				else 
@@ -223,9 +228,13 @@ public:
                         NormalIndex.push_back(normal - 1);
                     }
 
-                    TriangulateFace(PointIndex, NormalData, NormalIndex, NormalsUsed);
-				}
+                    int Count = TriangulateFace(PointIndex, NormalData, NormalIndex, NormalsUsed);
 
+                    for (int i = 1; i <= Count; i++)
+                    {
+                        TriangleArray.at(TriangleArray.size() - Count)->SetMaterial(CurrentMatt);
+                    }
+				}
 
 				//int p1, p2, p3;
 				//char space_holder;
@@ -235,6 +244,18 @@ public:
 				////order is p3 then p2 then p1 as .obj uses anti-clockwise, we use clockwise
 				//NewMesh.TriangleArray.push_back(std::move(NewTriangle));
 			}
+
+            else if (line.rfind("mtllib ", 0) == 0)
+            {
+                std::string FileName = line.substr(7, line.size() - 7);
+                Material::MaterialMapWithFile(FileName, MaterialData);
+            }
+
+            else if (line.rfind("usemtl ", 0) == 0)
+            {
+                std::string MaterialName = line.substr(7, line.size() - 7);
+                CurrentMatt = MaterialData[MaterialName];
+            }
 		}
 
 		FileInput.close();
@@ -456,7 +477,7 @@ private:
         return true;
     }
 
-    void TriangulateFace(std::vector<int>& PointIndexes, std::vector<Vector3D>& NormalData, std::vector<int>& NormalIndexes, bool UseNormals)
+    int TriangulateFace(std::vector<int>& PointIndexes, std::vector<Vector3D>& NormalData, std::vector<int>& NormalIndexes, bool UseNormals)
     {
         //.obj face data should ALWAYS be simple polygons with all points being coplaner
 
@@ -480,7 +501,7 @@ private:
 
         std::vector<Vector2D> PointXY = SquashToPlane(PointIndexes);
         std::vector<Vector2D> AllPoints = std::vector<Vector2D>(PointXY);
-
+        int Count = 0;
         //Vector2D A = PointXY[1];
         //Vector2D B = PointXY[3];
         //Vector2D C = PointXY[6];
@@ -525,7 +546,7 @@ private:
                                     PointArray[PointIndexes[j]],
                                     PointArray[PointIndexes[k]])));
                         }
-
+                        Count++;
                         std::vector<Vector2D>::iterator iterator1 = PointXY.begin() + i;
                         PointXY.erase(iterator1);
 
@@ -561,6 +582,9 @@ private:
                     PointArray[PointIndexes[1]],
                     PointArray[PointIndexes[2]])));
         }
+
+        Count++;
+        return Count;
     }
 
 };
