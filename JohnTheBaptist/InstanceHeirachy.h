@@ -27,16 +27,29 @@ namespace InstanceHeirachy
         Camera* CamRef = NULL;
         SubWorld* SubWorldRef = NULL;
 
+
+        AmbientLight* AmbientLightRef = NULL;
+        PointLight* PointLightRef = NULL;
+        DirectionalLight* DirectionalLightRef = NULL;
+
         switch (Ref->GetType())
         {
         case InstanceType::AmbientLightType:
-            throw EngineException("Unhandled instance type", "Need to implement deletion for this pointer type");
+            AmbientLightRef = dynamic_cast<AmbientLight*>(Ref);
+            Ref = NULL;
+            delete AmbientLightRef;
             break;
+
         case InstanceType::DirectionalLightType:
-            throw EngineException("Unhandled instance type", "Need to implement deletion for this pointer type");
+            DirectionalLightRef = dynamic_cast<DirectionalLight*>(Ref);
+            Ref = NULL;
+            delete DirectionalLightRef;
             break;
+
         case InstanceType::PointLightType:
-            throw EngineException("Unhandled instance type", "Need to implement deletion for this pointer type");
+            PointLightRef = dynamic_cast<PointLight*>(Ref);
+            Ref = NULL;
+            delete PointLightRef;
             break;
 
         case InstanceType::MeshInstanceType:
@@ -44,21 +57,25 @@ namespace InstanceHeirachy
             Ref = NULL;
             delete MeshRef;
             break;
+
         case InstanceType::SubWorldType:
             SubWorldRef = dynamic_cast<SubWorld*>(Ref);
             Ref = NULL;
             delete SubWorldRef;
             break;
+
         case InstanceType::FolderType:
             FoldRef = dynamic_cast<Folder*>(Ref);
             Ref = NULL;
             delete FoldRef;
             break;
+
         case InstanceType::CameraType:
             CamRef = dynamic_cast<Camera*>(Ref);
             Ref = NULL;
             delete CamRef;
             break;
+
         default:
             throw EngineException("Unhandled instance type", "Need to implement deletion for this pointer type");
             break;

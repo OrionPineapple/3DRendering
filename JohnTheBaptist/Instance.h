@@ -326,9 +326,10 @@ namespace InstanceHeirachy
 			return NULL;
 		}
 
-		std::vector<Instance*> GetAllChildMatchingState(InstanceSearchParameter Parameters)
+		std::vector<Instance*> GetAllChildrenMatchingState(InstanceSearchParameter Parameters)
 		{
 			std::vector<Instance*> Matching;
+
 			for (int ChildID : ChildrenIDs)
 			{
                 Instance* Child = WorldReference->GetInstance(ChildID);
@@ -337,6 +338,7 @@ namespace InstanceHeirachy
 					Matching.push_back(Child);
 				}
 			}
+
 			return Matching;
 		}
 

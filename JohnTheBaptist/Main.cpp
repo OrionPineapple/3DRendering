@@ -3,7 +3,7 @@
 class UserProgram : public Engine
 {
 private:
-    int Offset = 0;
+    InstanceHeirachy::SubWorld* TreeHolder;
 
 public:
 	UserProgram()
@@ -62,6 +62,8 @@ private:
         {
             Camera->Translate(CameraRotationMatrix * Vector3D(0, 0, DeltaTime));
         }
+
+        TreeHolder->SetMatrix(Matrix4x4::GetTranslationMatrix(Vector3D(0.0f, 6.0f * sinf(GetRunTime() * 0.6f), 0.0f)));
     }
 
 	bool PostFrame(float DeltaTime) override
@@ -78,17 +80,36 @@ private:
         InstanceHeirachy::World* World = GetWorld();
         InstanceHeirachy::Instance* WorldRoot = GetWorldRoot();
         InstanceHeirachy::Camera* Camera = GetCamera();
-        Camera->SetMatrix(Matrix4x4::GetRotationMatrix(Vector3D(0, 0, 0)) * Matrix4x4::GetTranslationMatrix(Vector3D(0.0f, 0.0f, 5.0f)));
+        Camera->SetMatrix(Matrix4x4::GetRotationMatrix(Vector3D(0, 0, 0)) * Matrix4x4::GetTranslationMatrix(Vector3D(0.0f, 4.0f, 0.0f)));
 
-        for (int i = 0; i < 10; i++)
+        TreeHolder = new InstanceHeirachy::SubWorld(World);
+        TreeHolder->SetName("TreeHolder");
+        TreeHolder->SetParent(WorldRoot);
+
+        InstanceHeirachy::AmbientLight* Ambient = new InstanceHeirachy::AmbientLight(World);
+        Ambient->SetLightColour(ColourRGB((int)(0.5f * 255.0f), (int)(0.5f * 255.0f), (int)(0.5f * 255.0f)));
+        Ambient->SetParent(WorldRoot);
+
+        InstanceHeirachy::PointLight* PointLight = new InstanceHeirachy::PointLight(World, Vector3D(0, 5, 0));
+        PointLight->SetLightColour(ColourRGB((int)(1.0f * 255.0f), (int)(1.0f * 255.0f), (int)(1.0f * 255.0f)));
+        PointLight->SetParent(TreeHolder);
+
+        for (int i = 0; i < 5; i++)
         {
             InstanceHeirachy::MeshInstance* MeshInstance = new InstanceHeirachy::MeshInstance
             (
                 World,
                 std::shared_ptr<Mesh>(new Mesh("TreeLowPoly.obj")),
-                Matrix4x4::GetTranslationMatrix(Vector3D(0, 0, i * 4.0f))
+                Matrix4x4::GetTranslationMatrix(Vector3D(30.0f * cosf(i * PI * 0.4f), 0, 30.0f * sinf(i * PI * 0.4f)))
             );
-            MeshInstance->SetParent(WorldRoot);
+            if (i % 2 == 0)
+            {
+                MeshInstance->SetParent(TreeHolder);
+            }
+            else 
+            {
+                MeshInstance->SetParent(WorldRoot);
+            }
         }
 
 		return true;
@@ -106,7 +127,7 @@ private:
 int main()
 {
 	UserProgram Program;
-	if (Program.Start("User Program", 400, 400))
+	if (Program.Start("User Program", 1000, 800))
 	{
 		//Program Successfully Started
 	}

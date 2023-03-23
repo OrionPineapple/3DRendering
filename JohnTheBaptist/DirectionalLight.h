@@ -15,14 +15,14 @@ namespace InstanceHeirachy
         DirectionalLight(World* WorldRef, Vector3D Direct)
         {
             Register(WorldRef);
-            Direction = Direct;
+            Direction = Vector3D::Normalise(Direct);
             Type = InstanceType::DirectionalLightType;
             BaseType = InstanceBaseType::LightBaseType;
         }
 
         void SetDirection(Vector3D Direct)
         {
-            Direction = Direct;
+            Direction = Vector3D::Normalise(Direct);
         }
 
         Vector3D GetDirection()

@@ -23,12 +23,6 @@ public:
 		Green = G;
 		Blue = B;
 	}
-    ColourRGB(float R, float G, float B)
-    {
-        Red = R * 255.0f;
-        Green = G * 255.0f;
-        Blue = B * 255.0f;
-    }
 
 public:
 	float GetBrightness()
@@ -102,28 +96,44 @@ public:
 	static ColourRGB GetMininum(ColourRGB A, ColourRGB B)
 	{
 		//Gets the mininum of each channel of colour
-		return ColourRGB(
-			(A.Red < B.Red && A.Red || B.Red),
-			(A.Green < B.Green&& A.Green || B.Green),
-			(A.Blue < B.Blue && A.Blue || B.Blue));
+
+        int Re = B.Red;
+        int Gr = B.Green;
+        int Bl = B.Blue;
+
+        if (A.Red < B.Red) { Re = A.Red; }
+        if (A.Green < B.Green) { Gr = A.Green; }
+        if (A.Blue < B.Blue) { Bl = A.Blue; }
+
+        return ColourRGB(Re, Gr, Bl);
 	}
 
 	static ColourRGB GetMaxinum(ColourRGB A, ColourRGB B)
 	{
 		//Gets the maxinum of each channel of colour
-		return ColourRGB(
-			(A.Red > B.Red&& A.Red || B.Red),
-			(A.Green > B.Green&& A.Green || B.Green),
-			(A.Blue > B.Blue&& A.Blue || B.Blue));
+        int Re = B.Red;
+        int Gr = B.Green;
+        int Bl = B.Blue;
+
+        if (A.Red > B.Red) { Re = A.Red; }
+        if (A.Green > B.Green) { Gr = A.Green; }
+        if (A.Blue > B.Blue) { Bl = A.Blue; }
+
+        return ColourRGB(Re, Gr, Bl);
 	}
 
 	static ColourRGB Multiply(ColourRGB A, ColourRGB B)
 	{
 		//multiply two colours
 		return ColourRGB(
-			(A.Red * B.Red) / 255,
-			(A.Blue * B.Blue) / 255,
-			(A.Green * B.Green) / 255);
+			(int)(((float)A.Red * (float)B.Red) / 255.0f),
+			(int)(((float)A.Green * (float)B.Green) / 255.0f),
+			(int)(((float)A.Blue * (float)B.Blue) / 255.0f));
 	}
+
+    ColourRGB operator * (float Scalar)
+    {
+        return ColourRGB((int)(Scalar * (float)Red), (int)(Scalar * (float)Green), (int)(Scalar * (float)Blue));
+    }
 };
 

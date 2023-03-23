@@ -32,6 +32,8 @@ public:
 		RunTime = 0.0f;
         Camera = new InstanceHeirachy::Camera(&World, FoV, &EngineController);
         WorldRoot = new InstanceHeirachy::SubWorld(&World);
+        WorldRoot->SetName("WorldRoot");
+        Camera->SetName("Camera");
 	}
 
 	bool Start(std::string Name, int Height = DefaultHeight, int Width = DefaultWidth)
@@ -89,7 +91,7 @@ private:
 		return (to - from) * alpha + from;
 	}
 
-	void FillTriangle(Triangle& ProjectedTriangle, Vector3D A, Vector3D B, Vector3D C, float q)
+	void FillTriangle(Triangle& ProjectedTriangle, Vector3D A, Vector3D B, Vector3D C, Vector3D& CameraPosition, ColourRGB& Ambient, std::vector<InstanceHeirachy::PointLight*>& PointLights, std::vector<InstanceHeirachy::DirectionalLight*>& DirectionalLights, Vector3D& Position, Vector3D& Normal)
 	{
 		float width = (float)Camera->GetScreenWidth();
 		float height = (float)Camera->GetScreenHeight();
@@ -134,14 +136,16 @@ private:
 			FillTriangleFromFlat(
 				x_a, y_a, z_a, 
 				x_b, y_b, z_b, 
-				x_c, y_c, z_c, q, ProjectedTriangle);
+				x_c, y_c, z_c,
+                ProjectedTriangle, CameraPosition, Ambient, PointLights, DirectionalLights, Position, Normal);
 		}
 		else if (y_b == y_c)
 		{
 			FillTriangleFromFlat(
 				x_c, y_c, z_c,
 				x_b, y_b, z_b,
-				x_a, y_a, z_a, q, ProjectedTriangle);
+				x_a, y_a, z_a,
+                ProjectedTriangle, CameraPosition, Ambient, PointLights, DirectionalLights, Position, Normal);
 		}
 		else 
 		{
@@ -155,11 +159,13 @@ private:
 			FillTriangleFromFlat(
 				x_k, y_k, z_k,
 				x_b, y_b, z_b,
-				x_a, y_a, z_a, q, ProjectedTriangle);
+				x_a, y_a, z_a,
+                ProjectedTriangle, CameraPosition, Ambient, PointLights, DirectionalLights, Position, Normal);
 			FillTriangleFromFlat(
 				x_b, y_b, z_b,
 				x_k, y_k, z_k,
-				x_c, y_c, z_c, q, ProjectedTriangle);
+				x_c, y_c, z_c,
+                ProjectedTriangle, CameraPosition, Ambient, PointLights, DirectionalLights, Position, Normal);
 			//b,k is inline
 		}
 
@@ -168,7 +174,7 @@ private:
         //PlacePoint(x_c, y_c, 1.0f);
 	}
 
-	void FillTriangleWithNormals(Triangle& ProjectedTriangle, Vector3D& A, Vector3D& B, Vector3D& C, Vector3D& LightDirection)
+	void FillTriangleWithNormals(Triangle& ProjectedTriangle, Vector3D& A, Vector3D& B, Vector3D& C, Vector3D& CameraPosition, ColourRGB& Ambient, std::vector<InstanceHeirachy::PointLight*>& PointLights, std::vector<InstanceHeirachy::DirectionalLight*>& DirectionalLights, Vector3D& Position)
 	{
 		Vector3D NA = ProjectedTriangle.GetVertexNormalA();
 		Vector3D NB = ProjectedTriangle.GetVertexNormalB();
@@ -221,7 +227,7 @@ private:
 				x_a, y_a, z_a, NA,
 				x_b, y_b, z_b, NB,
 				x_c, y_c, z_c, NC,
-				LightDirection, ProjectedTriangle);
+				ProjectedTriangle, CameraPosition, Ambient, PointLights, DirectionalLights, Position);
 		}
 		else if (y_b == y_c)
 		{
@@ -229,7 +235,7 @@ private:
 				x_c, y_c, z_c, NC,
 				x_b, y_b, z_b, NB,
 				x_a, y_a, z_a, NA,
-				LightDirection, ProjectedTriangle);
+				ProjectedTriangle, CameraPosition, Ambient, PointLights, DirectionalLights, Position);
 		}
 		else
 		{
@@ -245,19 +251,20 @@ private:
 				x_k, y_k, z_k, NK,
 				x_b, y_b, z_b, NB,
 				x_a, y_a, z_a, NA,
-				LightDirection, ProjectedTriangle);
+				ProjectedTriangle, CameraPosition, Ambient, PointLights, DirectionalLights, Position);
 			FillTriangleFromFlatWithNormals(
 				x_b, y_b, z_b, NB,
 				x_k, y_k, z_k, NK,
 				x_c, y_c, z_c, NC,
-				LightDirection, ProjectedTriangle);
+				ProjectedTriangle, CameraPosition, Ambient, PointLights, DirectionalLights, Position);
 
 			//b,k is inline
 		}
 	}
 
-	void FillTriangleFromFlatWithNormals(int& x_a, int& y_a, float& z_a, Vector3D& NA, int& x_b, int& y_b, float& z_b, Vector3D& NB, int& x_c, int& y_c, float& z_c, Vector3D& NC, Vector3D& LightDirection, Triangle& Tri)
+	void FillTriangleFromFlatWithNormals(int& x_a, int& y_a, float& z_a, Vector3D& NA, int& x_b, int& y_b, float& z_b, Vector3D& NB, int& x_c, int& y_c, float& z_c, Vector3D& NC, Triangle& Tri, Vector3D& CameraPosition, ColourRGB& Ambient, std::vector<InstanceHeirachy::PointLight*>& PointLights, std::vector<InstanceHeirachy::DirectionalLight*>& DirectionalLights, Vector3D& Position)
 	{
+        Material Matt = Tri.GetMaterial();
 		//y_a == y_b
 		int direction_y = 1;
 		if (y_c < y_a)
@@ -290,12 +297,10 @@ private:
 
 				if (GetDepthBufferAt(x, y) > z)
 				{
-					Vector3D n = Vector3D::Normalise(Vector3D::Interpolate(start_n, end_n, beta));
-					float q = Vector3D::Dot(n, LightDirection);
-					if (q < 0.1f) { q = 0.1f; }
+					Vector3D Normal = Vector3D::Normalise(Vector3D::Interpolate(start_n, end_n, beta));
 
 					SetDepthBufferAt(x, y, z);
-					Draw(x, y, Tri.GetMaterial().GetDiffuse());
+                    Draw(x, y, ShadePoint(Position, Normal, Matt, CameraPosition, Ambient, PointLights, DirectionalLights));
 				}
 			}
 		}
@@ -313,8 +318,9 @@ private:
 		}
 	}
 
-	void FillTriangleFromFlat(int x_a, int y_a, float z_a, int x_b, int y_b, float z_b, int x_c, int y_c, float z_c, float q, Triangle& Tri)
+	void FillTriangleFromFlat(int x_a, int y_a, float z_a, int x_b, int y_b, float z_b, int x_c, int y_c, float z_c, Triangle& Tri, Vector3D& CameraPosition, ColourRGB& Ambient, std::vector<InstanceHeirachy::PointLight*>& PointLights, std::vector<InstanceHeirachy::DirectionalLight*>& DirectionalLights, Vector3D& Position, Vector3D& Normal)
 	{
+        Material Matt = Tri.GetMaterial();
 		//y_a == y_b
 		int direction_y = 1;
 		if (y_c < y_a)
@@ -346,29 +352,59 @@ private:
 				if (GetDepthBufferAt(x, y) > z)
 				{
 					SetDepthBufferAt(x, y, z);
-					Draw(x, y, Tri.GetMaterial().GetDiffuse());
+					Draw(x, y, ShadePoint(Position, Normal, Matt, CameraPosition, Ambient, PointLights, DirectionalLights));
 				}
 			}
 		}
 	}
 
-	void ProjectAndDraw(Triangle& Tri, Matrix4x4& Projection, Matrix4x4& InverseRotate, Vector3D Normal, Vector3D Centre)
+    ColourRGB ShadePoint(Vector3D Position, Vector3D Normal, Material& Matt, Vector3D& CameraPos, ColourRGB& Ambient, std::vector<InstanceHeirachy::PointLight*>& PointLights, std::vector<InstanceHeirachy::DirectionalLight*>& DirectionalLights)
+    {
+        Vector3D ToCamera = Vector3D::Normalise(CameraPos - Position);
+        Normal = Vector3D::Normalise(Normal);
+        ColourRGB PixelAmbient = ColourRGB::Multiply(Ambient, Matt.GetAmbient());
+
+        ColourRGB PixelDiffuse = ColourRGB(0, 0, 0);
+        ColourRGB PixelSpecular = ColourRGB(0, 0, 0);
+
+        for (InstanceHeirachy::PointLight* PointLight : PointLights)
+        {
+            Vector3D ToLight = Vector3D::Normalise(PointLight->GetPoint() - Position);
+            float Dot = Vector3D::Dot(Normal, ToLight);
+            PixelDiffuse = ColourRGB::GetMaxinum(PixelDiffuse, ColourRGB::Multiply(Matt.GetDiffuse(), PointLight->GetLightColour() * Dot));
+
+            Vector3D ReflectedRay = Vector3D::Normalise((Normal * 2 * Dot) - ToLight);
+            Dot = Vector3D::Dot(ReflectedRay, ToCamera);
+            PixelSpecular = ColourRGB::GetMaxinum(PixelSpecular, ColourRGB::Multiply(Matt.GetSpecular(), PointLight->GetLightColour() * Dot));
+        }
+
+        for (InstanceHeirachy::DirectionalLight* DirectionalLight : DirectionalLights)
+        {
+            Vector3D ToLight = -DirectionalLight->GetDirection();
+            float Dot = Vector3D::Dot(Normal, ToLight);
+            PixelDiffuse = ColourRGB::GetMaxinum(PixelDiffuse, ColourRGB::Multiply(Matt.GetDiffuse(), DirectionalLight->GetLightColour() * Dot));
+
+            Vector3D ReflectedRay = Vector3D::Normalise((Normal * 2 * Dot) - ToLight);
+            Dot = Vector3D::Dot(ReflectedRay, ToCamera);
+            PixelSpecular = ColourRGB::GetMaxinum(PixelSpecular, ColourRGB::Multiply(Matt.GetSpecular(), DirectionalLight->GetLightColour() * Dot));
+        }
+
+        return ColourRGB::GetMaxinum(PixelAmbient, ColourRGB::GetMaxinum(PixelSpecular, PixelDiffuse));
+        //return Matt.GetDiffuse();
+    }
+
+	void ProjectAndDraw(Triangle& Tri, Matrix4x4& Projection, Matrix4x4& InverseRotate, Vector3D& Normal, Vector3D& CameraPosition, ColourRGB& Ambient, std::vector<InstanceHeirachy::PointLight*>& PointLights, std::vector<InstanceHeirachy::DirectionalLight*>& DirectionalLights, Vector3D& Position)
 	{
-		Vector3D ToLight = Vector3D::Normalise(InverseRotate * (Camera->ExtractVectorPosition() - Centre));
 		Vector3D A, B, C;
 		Triangle::Project(Tri, Projection, A, B, C);
 
-		if (Tri.HasVertexNormals())
-		{
-			FillTriangleWithNormals(Tri, A, B, C, ToLight);
-		}
+        if (Tri.HasVertexNormals())
+        {
+            FillTriangleWithNormals(Tri, A, B, C, CameraPosition, Ambient, PointLights, DirectionalLights, Position);
+        }
 		else
 		{
-			//ToLight = Vector3D::Normalise(Camera->ExtractVectorPosition() - Centre);
-            ToLight = Vector3D::Normalise(Vector3D(2, 2, 2));
-			float light_value = Vector3D::Dot(ToLight, Normal);
-			if (light_value < 0.1f) { light_value = 0.1f; }
-			FillTriangle(Tri, A, B, C, light_value);
+			FillTriangle(Tri, A, B, C, CameraPosition, Ambient, PointLights, DirectionalLights, Position, Normal);
 		}
 	}
 
@@ -603,61 +639,41 @@ private:
         return NewTriangles;
     }
 
-	bool OnUpdate(float DeltaTime)
-	{
-        //Standard Reset of all important frame data
-		RunTime += DeltaTime;
-		EngineController.Clear(olc::Pixel(0, 0, 0, 0));
-		std::fill(DepthBuffer.begin(), DepthBuffer.end(), Camera->GetMaxinumDepth());
-        
-        //allows the client to move objects, handle inputs etc before rendering
-        PreFrame(DeltaTime);
+    void RenderSubWorld(std::vector<InstanceHeirachy::SubWorldStackFrame>& Stack, Matrix4x4& Projection, Matrix4x4& InverseCameraRotation, Matrix4x4& InverseCameraTranslation, Vector3D& CameraPos, ColourRGB& Ambient, std::vector<InstanceHeirachy::PointLight*>& PointLights, std::vector<InstanceHeirachy::DirectionalLight*>& DirectionalLights)
+    {
+        InstanceHeirachy::SubWorldStackFrame Frame = Stack.at(Stack.size() - 1);
 
-        //Find all applicable rendarable objects
-        InstanceHeirachy::InstanceSearchParameter SearchParameter;
-        //SearchParameter.SetEnabled(true);
-        //SearchParameter.SetBaseType(InstanceHeirachy::InstanceBaseType::MatrixInstanceBaseType);
-        //SearchParameter.SetType(InstanceHeirachy::InstanceType::MeshInstanceType);
-        std::vector<InstanceHeirachy::Instance*> RenderableChildren = WorldRoot->GetAllChildMatchingState(SearchParameter);
-        //std::cout << RenderableChildren.size();
+        Matrix4x4 SubWorldOffset;
 
-        //Get Camera Matrices
-        Vector3D CamPos = Camera->ExtractVectorPosition();
-        Matrix4x4 CameraTranslation = Camera->ExtractTranslationMatrix();
-        Matrix4x4 InverseCameraTranslation = CameraTranslation.Inverse();
-
-        Matrix4x4 CameraRotationMatrix = Camera->ExtractRotationMatrix();
-        Matrix4x4 InverseCameraRotation = CameraRotationMatrix.Inverse();
-
-        Matrix4x4 Projection = Matrix4x4::CreateProjectionMatrix(Camera->GetAspectRatio(), Camera->GetVerticalFoV(), Camera->GetMininumDepth(), Camera->GetMaxinumDepth());
-
-        //Render each object
-        for (InstanceHeirachy::Instance* InstanceToRender : RenderableChildren)
+        for (InstanceHeirachy::SubWorldStackFrame TransformFrame : Stack)
         {
-            InstanceHeirachy::MeshInstance* MeshToRender = dynamic_cast<InstanceHeirachy::MeshInstance*>(InstanceToRender);
-            
+            SubWorldOffset = Frame.Transform * SubWorldOffset;
+        }
 
-            Matrix4x4 Translate = MeshToRender->ExtractTranslationMatrix();
+        for (InstanceHeirachy::MeshInstance* MeshToRender : Frame.Meshes)
+        {
+            Matrix4x4 Transform = MeshToRender->GetMatrix() * SubWorldOffset;
+            Matrix4x4 InverseTransform = Transform.Inverse();
+
+            Matrix4x4 Translate = Transform.ExtractTranslationMatrix();
             Matrix4x4 InverseTranslate = Translate.Inverse();
 
-            Matrix4x4 Rotate = MeshToRender->ExtractRotationMatrix();
+            Matrix4x4 Rotate = Transform.ExtractRotationMatrix();
             Matrix4x4 InverseRotate = Rotate.Inverse();
 
-            Matrix4x4 Transform = MeshToRender->GetMatrix();
-            Matrix4x4 InverseTransform = Transform.Inverse();
-            //Matrix4x4 InverseTransform = InverseRotate * InverseTranslate;
 
             Matrix4x4 FinalProjection = Projection * InverseCameraRotation * InverseCameraTranslation * Transform;
             std::vector<InstanceHeirachy::Plane> CullingPlanes = Camera->GetCullingPlanes(InverseTransform, InverseRotate);
 
             std::shared_ptr<Mesh> MeshRef = MeshToRender->GetReferenceToMesh();
             std::vector<std::shared_ptr<Triangle>> TriangleArray = *(MeshRef->GetTriangleReferences());
+
             for (int i = 0; i < TriangleArray.size(); i++)
             {
                 std::shared_ptr<Triangle> Tri = TriangleArray[i];
 
                 Vector3D Centre = Transform * Tri->GetCentre();
-                Vector3D ToCamera = CamPos - Centre;
+                Vector3D ToCamera = CameraPos - Centre;
                 Vector3D Normal = Rotate * Tri->GetNormal();
                 float dot = Vector3D::Dot(ToCamera, Normal);
 
@@ -674,9 +690,97 @@ private:
                 for (Triangle RenderableTri : TrianglesToRender)
                 {
                     RenderableTri.SetMaterial(Tri->GetMaterial());
-                    ProjectAndDraw(RenderableTri, FinalProjection, InverseRotate, Normal, RenderableTri.GetCentre());
+                    Vector3D Pos = Transform * Centre;
+                    Vector3D Nor = Transform.ExtractRotationMatrix() * Normal;
+                    ProjectAndDraw(RenderableTri, FinalProjection, InverseRotate, Normal, CameraPos, Ambient, PointLights, DirectionalLights, Pos);
                 }
 
+            }
+        }
+    }
+
+    void GatherLightData(std::vector<InstanceHeirachy::SubWorldStackFrame> Stack, ColourRGB& Ambient, std::vector<InstanceHeirachy::PointLight*>& PointLights, std::vector<InstanceHeirachy::DirectionalLight*>& DirectionalLights)
+    {
+        Ambient = ColourRGB(0, 0, 0);
+        for (InstanceHeirachy::SubWorldStackFrame Frame : Stack)
+        {
+            for (InstanceHeirachy::Light* Light : Frame.Lights)
+            {
+                InstanceHeirachy::AmbientLight* AmbientLight;
+                InstanceHeirachy::PointLight* PointLight;
+                InstanceHeirachy::DirectionalLight* DirectionalLight;
+
+
+                switch (Light->GetType())
+                {
+                case InstanceHeirachy::InstanceType::AmbientLightType:
+                    AmbientLight = dynamic_cast<InstanceHeirachy::AmbientLight*>(Light);
+                    Ambient = ColourRGB::GetMaxinum(Ambient, AmbientLight->GetLightColour());
+                    break;
+
+                case InstanceHeirachy::InstanceType::PointLightType:
+                    PointLight = dynamic_cast<InstanceHeirachy::PointLight*>(Light);
+                    PointLights.push_back(PointLight);
+                    break;
+
+                case InstanceHeirachy::InstanceType::DirectionalLightType:
+                    DirectionalLight = dynamic_cast<InstanceHeirachy::DirectionalLight*>(Light);
+                    DirectionalLights.push_back(DirectionalLight);
+                    break;
+                }
+            }
+        }
+    }
+
+	bool OnUpdate(float DeltaTime)
+	{
+        //Standard Reset of all important frame data
+		RunTime += DeltaTime;
+		EngineController.Clear(olc::Pixel(0, 0, 0, 0));
+		std::fill(DepthBuffer.begin(), DepthBuffer.end(), Camera->GetMaxinumDepth());
+        
+        //allows the client to move objects, handle inputs etc before rendering
+        PreFrame(DeltaTime);
+
+        //Render Pass
+
+        std::vector<InstanceHeirachy::SubWorldStackFrame> Stack;
+        Stack.push_back(WorldRoot->GetSubWorldStackFrame());
+        InstanceHeirachy::SubWorldStackFrame Frame = Stack.at(Stack.size() - 1);
+
+        Vector3D CameraPosition = Camera->ExtractVectorPosition();
+        Matrix4x4 CameraTranslation = Camera->ExtractTranslationMatrix();
+        Matrix4x4 InverseCameraTranslation = CameraTranslation.Inverse();
+        Matrix4x4 CameraRotationMatrix = Camera->ExtractRotationMatrix();
+        Matrix4x4 InverseCameraRotation = CameraRotationMatrix.Inverse();
+        Matrix4x4 Projection = Matrix4x4::CreateProjectionMatrix(Camera->GetAspectRatio(), Camera->GetVerticalFoV(), Camera->GetMininumDepth(), Camera->GetMaxinumDepth());
+
+        while (Stack.size() > 0)
+        {
+            Frame = Stack.at(Stack.size() - 1);
+
+            //std::cout << "Rendered: " << Frame.Name << std::endl;
+            ColourRGB Ambient;
+            std::vector<InstanceHeirachy::PointLight*> PointLights;
+            std::vector<InstanceHeirachy::DirectionalLight*> DirectionalLights;
+            GatherLightData(Stack, Ambient, PointLights, DirectionalLights);
+
+            RenderSubWorld(Stack, Projection, InverseCameraRotation, InverseCameraTranslation, CameraPosition, Ambient, PointLights, DirectionalLights);
+            
+            if (Frame.SubWorldIndex >= Frame.SubWorlds.size())
+            {
+                while (Frame.SubWorldIndex >= Frame.SubWorlds.size() && Stack.size() > 0)
+                {
+                    Frame = Stack.at(Stack.size() - 1);
+                    Stack.erase(Stack.end() - 1);
+                }
+            }
+            else
+            {
+                Stack.push_back(Frame.SubWorlds[Frame.SubWorldIndex]->GetSubWorldStackFrame());
+                Frame.SubWorldIndex++;
+                //push frame[index]
+                //increment index
             }
         }
 
@@ -756,16 +860,20 @@ public:
 public:
 	float GetDepthBufferAt(int x, int y)
 	{
-		/*if (x < 0) { return -1.0f; }
+		if (x < 0) { return -1.0f; }
 		if (y < 0) { return -1.0f; }
-		if (x > Camera->GetScreenWidth()) { return -1.0f; }
-		if (y > Camera->GetScreenHeight()) { return -1.0f; }*/
+		if (x >= Camera->GetScreenWidth()) { return -1.0f; }
+		if (y >= Camera->GetScreenHeight()) { return -1.0f; }
 		return DepthBuffer[x + (Camera->GetScreenWidth() * y)];
 	}
 
 private:
 	void SetDepthBufferAt(int x, int y, float z)
 	{
+        if (x < 0) { return; }
+        if (y < 0) { return; }
+        if (x >= Camera->GetScreenWidth()) { return; }
+        if (y >= Camera->GetScreenHeight()) { return; }
 		DepthBuffer[x + (Camera->GetScreenWidth() * y)] = z;
 	}
 

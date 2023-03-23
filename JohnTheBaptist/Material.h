@@ -52,7 +52,7 @@ public:
                     float a, b, c;
                     char space_holder;
                     streamhandler >> space_holder >> space_holder >> a >> b >> c;
-                    CurrentMaterial.SetAmbient(ColourRGB(a, b, c));
+                    CurrentMaterial.SetAmbient(ColourRGB((int)(a * 255.0f), (int)(b * 255.0f), (int)(c * 255.0f)));
                 }
 
                 //Specular
@@ -61,7 +61,7 @@ public:
                     float a, b, c;
                     char space_holder;
                     streamhandler >> space_holder >> space_holder >> a >> b >> c;
-                    CurrentMaterial.SetSpecular(ColourRGB(a, b, c));
+                    CurrentMaterial.SetSpecular(ColourRGB((int)(a * 255.0f), (int)(b * 255.0f), (int)(c * 255.0f)));
                 }
 
                 //Diffuse
@@ -70,7 +70,7 @@ public:
                     float a, b, c;
                     char space_holder;
                     streamhandler >> space_holder >> space_holder >> a >> b >> c;
-                    CurrentMaterial.SetDiffuse(ColourRGB(a, b, c));
+                    CurrentMaterial.SetDiffuse(ColourRGB((int)(a * 255.0f), (int)(b * 255.0f), (int)(c * 255.0f)));
                 }
             }
 
