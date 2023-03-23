@@ -16,7 +16,7 @@ class Engine
 {
 private:
     //Render Stuff
-	olc::PixelGameEngine EngineController;
+	EngineIO::PixelGameEngine EngineController;
 	float RunTime;
 	std::vector<float> DepthBuffer;
     Vector2D PreviousMouseCoordinates;
@@ -62,30 +62,30 @@ private:
 		return OnStart();
 	}
 
-	void Draw(int x, int y)
-	{
-		EngineController.Draw(x, y);
-	}
-
-    void Draw(int x, int y, float r, float g, float b)
-    {
-        EngineController.Draw(x, y, olc::PixelF(r, g, b));
-    }
-
 public:
     void Draw(int x, int y, ColourRGB Colour)
     {
-        EngineController.Draw(x, y, olc::PixelF((float)Colour.GetRed() / (float)255, (float)Colour.GetGreen() / (float)255, (float)Colour.GetBlue() / (float)255));
+        if (x < 0 || y < 0 || x >= Camera->GetScreenWidth() || y >= Camera->GetScreenHeight())
+        {
+            throw EngineException("Cannot draw out of bounds of the screen", "The coordinates: (" + std::to_string(x) + ", " + std::to_string(y) + ") are invalid)");
+            return;
+        }
+        EngineController.Draw(x, y, EngineIO::PixelF((float)Colour.GetRed() / (float)255, (float)Colour.GetGreen() / (float)255, (float)Colour.GetBlue() / (float)255));
+    }
+
+    ColourRGB GetPixel(int x, int y)
+    {
+        if (x < 0 || y < 0 || x >= Camera->GetScreenWidth() || y >= Camera->GetScreenHeight()) 
+        { 
+            throw EngineException("Cannot get pixel out of bounds of the screen", "The coordinates: (" + std::to_string(x) + ", " + std::to_string(y) + ") are invalid)"); 
+            return ColourRGB(); 
+        }
+
+        EngineIO::Pixel P = EngineController.GetDrawn(x, y);
+        return ColourRGB(P.r, P.g, P.b);
     }
 
 private:
-	void Draw(int x, int y, float brightness)
-	{
-        //EngineController.Draw(x, y, olc::PixelF(1.0f, brightness, brightness, 1.0f));
-		EngineController.Draw(x, y, olc::PixelF(brightness, brightness, brightness, 1.0f));
-		//EngineController.Draw(x, y, olc::PixelF(1.0f - brightness, brightness, 0.5f + brightness * 0.5f, 1.0f));
-	}
-
 	float Interpolate(float from, float to, float alpha)
 	{
 		return (to - from) * alpha + from;
@@ -302,18 +302,6 @@ private:
 					SetDepthBufferAt(x, y, z);
                     Draw(x, y, ShadePoint(Position, Normal, Matt, CameraPosition, Ambient, PointLights, DirectionalLights));
 				}
-			}
-		}
-	}
-
-	void PlacePoint(int x, int y, float bright = 0.0f)
-	{
-		int Spread = 3;
-		for (int i = x - Spread; i <= x + Spread; i++)
-		{
-			for (int j = y - Spread; j <= y + Spread; j++)
-			{
-				Draw(i, j, bright);
 			}
 		}
 	}
@@ -736,7 +724,7 @@ private:
 	{
         //Standard Reset of all important frame data
 		RunTime += DeltaTime;
-		EngineController.Clear(olc::Pixel(0, 0, 0, 0));
+		EngineController.Clear(EngineIO::Pixel(0, 0, 0, 0));
 		std::fill(DepthBuffer.begin(), DepthBuffer.end(), Camera->GetMaxinumDepth());
         
         //allows the client to move objects, handle inputs etc before rendering
@@ -827,17 +815,17 @@ public:
 		return EngineController.GetMaxFPS();
 	}
 
-    bool IsKeyDown(olc::Key Key)
+    bool IsKeyDown(EngineIO::Key Key)
     {
         return EngineController.GetKey(Key).bHeld;
     }
 
-    bool IsKeyPressed(olc::Key Key)
+    bool IsKeyPressed(EngineIO::Key Key)
     {
         return EngineController.GetKey(Key).bPressed;
     }
 
-    bool IsKeyReleased(olc::Key Key)
+    bool IsKeyReleased(EngineIO::Key Key)
     {
         return EngineController.GetKey(Key).bReleased;
     }

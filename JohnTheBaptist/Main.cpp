@@ -3,7 +3,9 @@
 class UserProgram : public Engine
 {
 private:
-    InstanceHeirachy::SubWorld* TreeHolder;
+    InstanceHeirachy::DirectionalLight* RedLight;
+    InstanceHeirachy::DirectionalLight* BlueLight;
+    InstanceHeirachy::DirectionalLight* GreenLight;
 
 public:
 	UserProgram()
@@ -16,19 +18,19 @@ private:
     {
         InstanceHeirachy::Camera* Camera = GetCamera();
 
-        if (IsKeyDown(olc::Key::UP))
+        if (IsKeyDown(EngineIO::Key::UP))
         {
             Camera->RotateX(DeltaTime);
         }
-        if (IsKeyDown(olc::Key::DOWN))
+        if (IsKeyDown(EngineIO::Key::DOWN))
         {
             Camera->RotateX(-DeltaTime);
         }
-        if (IsKeyDown(olc::Key::LEFT))
+        if (IsKeyDown(EngineIO::Key::LEFT))
         {
             Camera->SetMatrix(Camera->ExtractTranslationMatrix() * Matrix4x4::GetYRotationMatrix(-DeltaTime) * Camera->ExtractRotationMatrix());
         }
-        if (IsKeyDown(olc::Key::RIGHT))
+        if (IsKeyDown(EngineIO::Key::RIGHT))
         {
             Camera->SetMatrix(Camera->ExtractTranslationMatrix() * Matrix4x4::GetYRotationMatrix(DeltaTime) * Camera->ExtractRotationMatrix());
         }
@@ -38,32 +40,35 @@ private:
         Matrix4x4 CameraRotationMatrix = Camera->ExtractRotationMatrix();
         Matrix4x4 InverseCameraRotation = CameraRotationMatrix.Inverse();
 
-        if (IsKeyDown(olc::Key::W))
+        if (IsKeyDown(EngineIO::Key::W))
         {
             Camera->Translate(CameraRotationMatrix * Vector3D(0, DeltaTime, 0));
         }
-        if (IsKeyDown(olc::Key::S))
+        if (IsKeyDown(EngineIO::Key::S))
         {
             Camera->Translate(CameraRotationMatrix * Vector3D(0, -DeltaTime, 0));
         }
-        if (IsKeyDown(olc::Key::A))
+        if (IsKeyDown(EngineIO::Key::A))
         {
             Camera->Translate(CameraRotationMatrix * Vector3D(DeltaTime, 0, 0));
         }
-        if (IsKeyDown(olc::Key::D))
+        if (IsKeyDown(EngineIO::Key::D))
         {
             Camera->Translate(CameraRotationMatrix * Vector3D(-DeltaTime, 0, 0));
         }
-        if (IsKeyDown(olc::Key::SHIFT))
+        if (IsKeyDown(EngineIO::Key::SHIFT))
         {
             Camera->Translate(CameraRotationMatrix * Vector3D(0, 0, -DeltaTime));
         }
-        if (IsKeyDown(olc::Key::CTRL))
+        if (IsKeyDown(EngineIO::Key::CTRL))
         {
             Camera->Translate(CameraRotationMatrix * Vector3D(0, 0, DeltaTime));
         }
 
-        TreeHolder->SetMatrix(Matrix4x4::GetTranslationMatrix(Vector3D(0.0f, 6.0f * sinf(GetRunTime() * 0.6f), 0.0f)));
+        BlueLight->SetDirection(Vector3D(sinf(GetRunTime() + 0.666f * PI), 0.0f, cosf(GetRunTime() + 0.6666f * PI)));
+        RedLight->SetDirection(Vector3D(sinf(GetRunTime() + 1.33333 * PI), 0.0f, cosf(GetRunTime() + 1.333333f * PI)));
+        GreenLight->SetDirection(Vector3D(sinf(GetRunTime()), 0.0f, cosf(GetRunTime())));
+
     }
 
 	bool PostFrame(float DeltaTime) override
@@ -80,38 +85,27 @@ private:
         InstanceHeirachy::World* World = GetWorld();
         InstanceHeirachy::Instance* WorldRoot = GetWorldRoot();
         InstanceHeirachy::Camera* Camera = GetCamera();
-        Camera->SetMatrix(Matrix4x4::GetRotationMatrix(Vector3D(0, 0, 0)) * Matrix4x4::GetTranslationMatrix(Vector3D(0.0f, 4.0f, 0.0f)));
+        Camera->SetMatrix(Matrix4x4::GetRotationMatrix(Vector3D(0, 0, 0)) * Matrix4x4::GetTranslationMatrix(Vector3D(0.0f, 0.0f, 4.0f)));
 
-        TreeHolder = new InstanceHeirachy::SubWorld(World);
-        TreeHolder->SetName("TreeHolder");
-        TreeHolder->SetParent(WorldRoot);
+        RedLight = new InstanceHeirachy::DirectionalLight(World, Vector3D(0, 0, 0));
+        RedLight->SetLightColour(ColourRGB(255, 0, 0));
+        RedLight->SetParent(WorldRoot);
 
-        InstanceHeirachy::AmbientLight* Ambient = new InstanceHeirachy::AmbientLight(World);
-        Ambient->SetLightColour(ColourRGB((int)(0.5f * 255.0f), (int)(0.5f * 255.0f), (int)(0.5f * 255.0f)));
-        Ambient->SetParent(WorldRoot);
+        BlueLight = new InstanceHeirachy::DirectionalLight(World, Vector3D(0, 0, 0));
+        BlueLight->SetLightColour(ColourRGB(0, 0, 255));
+        BlueLight->SetParent(WorldRoot);
 
-        InstanceHeirachy::PointLight* PointLight = new InstanceHeirachy::PointLight(World, Vector3D(0, 5, 0));
-        PointLight->SetLightColour(ColourRGB((int)(1.0f * 255.0f), (int)(1.0f * 255.0f), (int)(1.0f * 255.0f)));
-        PointLight->SetParent(TreeHolder);
+        GreenLight = new InstanceHeirachy::DirectionalLight(World, Vector3D(0, 0, 0));
+        GreenLight->SetLightColour(ColourRGB(0, 255, 0));
+        GreenLight->SetParent(WorldRoot);
 
-        for (int i = 0; i < 5; i++)
-        {
-            InstanceHeirachy::MeshInstance* MeshInstance = new InstanceHeirachy::MeshInstance
-            (
-                World,
-                std::shared_ptr<Mesh>(new Mesh("TreeLowPoly.obj")),
-                Matrix4x4::GetTranslationMatrix(Vector3D(30.0f * cosf(i * PI * 0.4f), 0, 30.0f * sinf(i * PI * 0.4f)))
-            );
-            if (i % 2 == 0)
-            {
-                MeshInstance->SetParent(TreeHolder);
-            }
-            else 
-            {
-                MeshInstance->SetParent(WorldRoot);
-            }
-        }
-
+        InstanceHeirachy::MeshInstance* MeshInstance = new InstanceHeirachy::MeshInstance
+        (
+            World,
+            std::shared_ptr<Mesh>(new Mesh("Cube.obj")),
+            Matrix4x4::GetTranslationMatrix(Vector3D(0,0,0))
+        );
+        MeshInstance->SetParent(WorldRoot);
 		return true;
 	}
 

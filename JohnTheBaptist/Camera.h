@@ -23,10 +23,10 @@ namespace InstanceHeirachy
         float MaxinumDepth = 1000.0f;
         float VerticalFoV;
         float AspectRatio;
-        olc::PixelGameEngine *EngineController;
+        EngineIO::PixelGameEngine *EngineController;
 
     public:
-        Camera(World* WorldRef, float FoV, olc::PixelGameEngine* Controller)
+        Camera(World* WorldRef, float FoV, EngineIO::PixelGameEngine* Controller)
         {
             Register(WorldRef);
             Type = InstanceType::CameraType;

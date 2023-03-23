@@ -17,19 +17,19 @@
 //    {
 //        InstanceHeirachy::Camera* Camera = GetCamera();
 //
-//        if (IsKeyDown(olc::Key::UP))
+//        if (IsKeyDown(EngineIO::Key::UP))
 //        {
 //            Camera->RotateX(DeltaTime);
 //        }
-//        if (IsKeyDown(olc::Key::DOWN))
+//        if (IsKeyDown(EngineIO::Key::DOWN))
 //        {
 //            Camera->RotateX(-DeltaTime);
 //        }
-//        if (IsKeyDown(olc::Key::LEFT))
+//        if (IsKeyDown(EngineIO::Key::LEFT))
 //        {
 //            Camera->SetMatrix(Camera->ExtractTranslationMatrix() * Matrix4x4::GetYRotationMatrix(-DeltaTime) * Camera->ExtractRotationMatrix());
 //        }
-//        if (IsKeyDown(olc::Key::RIGHT))
+//        if (IsKeyDown(EngineIO::Key::RIGHT))
 //        {
 //            Camera->SetMatrix(Camera->ExtractTranslationMatrix() * Matrix4x4::GetYRotationMatrix(DeltaTime) * Camera->ExtractRotationMatrix());
 //        }
@@ -39,27 +39,27 @@
 //        Matrix4x4 CameraRotationMatrix = Camera->ExtractRotationMatrix();
 //        Matrix4x4 InverseCameraRotation = CameraRotationMatrix.Inverse();
 //
-//        if (IsKeyDown(olc::Key::W))
+//        if (IsKeyDown(EngineIO::Key::W))
 //        {
 //            Camera->Translate(CameraRotationMatrix * Vector3D(0, DeltaTime, 0));
 //        }
-//        if (IsKeyDown(olc::Key::S))
+//        if (IsKeyDown(EngineIO::Key::S))
 //        {
 //            Camera->Translate(CameraRotationMatrix * Vector3D(0, -DeltaTime, 0));
 //        }
-//        if (IsKeyDown(olc::Key::A))
+//        if (IsKeyDown(EngineIO::Key::A))
 //        {
 //            Camera->Translate(CameraRotationMatrix * Vector3D(DeltaTime, 0, 0));
 //        }
-//        if (IsKeyDown(olc::Key::D))
+//        if (IsKeyDown(EngineIO::Key::D))
 //        {
 //            Camera->Translate(CameraRotationMatrix * Vector3D(-DeltaTime, 0, 0));
 //        }
-//        if (IsKeyDown(olc::Key::SHIFT))
+//        if (IsKeyDown(EngineIO::Key::SHIFT))
 //        {
 //            Camera->Translate(CameraRotationMatrix * Vector3D(0, 0, -DeltaTime));
 //        }
-//        if (IsKeyDown(olc::Key::CTRL))
+//        if (IsKeyDown(EngineIO::Key::CTRL))
 //        {
 //            Camera->Translate(CameraRotationMatrix * Vector3D(0, 0, DeltaTime));
 //        }
@@ -67,7 +67,7 @@
 //        InstanceHeirachy::World* World = GetWorld();
 //        InstanceHeirachy::Instance* WorldRoot = GetWorldRoot();
 //
-//        if (IsKeyPressed(olc::Key::SPACE))
+//        if (IsKeyPressed(EngineIO::Key::SPACE))
 //        {
 //            Offset += 5;
 //
@@ -80,7 +80,7 @@
 //            MeshInstance->SetParent(WorldRoot);
 //        }
 //
-//        if (IsKeyPressed(olc::Key::F))
+//        if (IsKeyPressed(EngineIO::Key::F))
 //        {
 //            Vector3D CamPos = Camera->ExtractVectorPosition();
 //            InstanceHeirachy::InstanceSearchParameter Search = InstanceHeirachy::InstanceSearchParameter();

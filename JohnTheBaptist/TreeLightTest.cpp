@@ -3,10 +3,7 @@
 //class UserProgram : public Engine
 //{
 //private:
-//    int Width = 500;
-//    int Length = 500;
-//    float Seperation = 0.1f;
-//    InstanceHeirachy::MeshInstance* MeshInstance;
+//    InstanceHeirachy::SubWorld* TreeHolder;
 //
 //public:
 //    UserProgram()
@@ -65,19 +62,8 @@
 //        {
 //            Camera->Translate(CameraRotationMatrix * Vector3D(0, 0, DeltaTime));
 //        }
-//        
 //
-//        
-//        std::vector<std::shared_ptr<Point>>* VectorOfPoints = MeshInstance->GetReferenceToMesh().get()->GetPointReferences();
-//        for (int x = 0; x < Width; x++)
-//        {
-//            for(int y = 0; y < Height; y++)
-//            {
-//                float Displacement = sinf(x + y + t);
-//                Vector3D Position = Vector3D((float)x * Seperation, Displacement, (float)y * Seperation);
-//                VectorOfPoints->at(x + (y * Width)).get()->SetPosition(Position);
-//            }
-//        }
+//        TreeHolder->SetMatrix(Matrix4x4::GetTranslationMatrix(Vector3D(0.0f, 6.0f * sinf(GetRunTime() * 0.6f), 0.0f)));
 //    }
 //
 //    bool PostFrame(float DeltaTime) override
@@ -93,49 +79,38 @@
 //
 //        InstanceHeirachy::World* World = GetWorld();
 //        InstanceHeirachy::Instance* WorldRoot = GetWorldRoot();
+//        InstanceHeirachy::Camera* Camera = GetCamera();
+//        Camera->SetMatrix(Matrix4x4::GetRotationMatrix(Vector3D(0, 0, 0)) * Matrix4x4::GetTranslationMatrix(Vector3D(0.0f, 4.0f, 0.0f)));
 //
-//        Mesh* PlanarMesh = new Mesh();
-//        std::vector<std::shared_ptr<Point>>* VectorOfPoints = PlanarMesh->GetPointReferences();
-//        std::vector<std::shared_ptr<Triangle>>* VectorOfTriangles = PlanarMesh->GetTriangleReferences();
+//        TreeHolder = new InstanceHeirachy::SubWorld(World);
+//        TreeHolder->SetName("TreeHolder");
+//        TreeHolder->SetParent(WorldRoot);
 //
-//    
-//        for (int x = 0; x < Width; x++)
+//        InstanceHeirachy::AmbientLight* Ambient = new InstanceHeirachy::AmbientLight(World);
+//        Ambient->SetLightColour(ColourRGB((int)(0.5f * 255.0f), (int)(0.5f * 255.0f), (int)(0.5f * 255.0f)));
+//        Ambient->SetParent(WorldRoot);
+//
+//        InstanceHeirachy::PointLight* PointLight = new InstanceHeirachy::PointLight(World, Vector3D(0, 5, 0));
+//        PointLight->SetLightColour(ColourRGB((int)(1.0f * 255.0f), (int)(1.0f * 255.0f), (int)(1.0f * 255.0f)));
+//        PointLight->SetParent(TreeHolder);
+//
+//        for (int i = 0; i < 5; i++)
 //        {
-//            for(int y = 0; y < Height; y++)
+//            InstanceHeirachy::MeshInstance* MeshInstance = new InstanceHeirachy::MeshInstance
+//            (
+//                World,
+//                std::shared_ptr<Mesh>(new Mesh("TreeLowPoly.obj")),
+//                Matrix4x4::GetTranslationMatrix(Vector3D(30.0f * cosf(i * PI * 0.4f), 0, 30.0f * sinf(i * PI * 0.4f)))
+//            );
+//            if (i % 2 == 0)
 //            {
-//                Vector3D Position = Vector3D((float)x * Seperation, 0, (float)y * Seperation);
-//                VectorOfPoints->push_back(std::shared_ptr<Point>>(new Point(Position)));
+//                MeshInstance->SetParent(TreeHolder);
+//            }
+//            else
+//            {
+//                MeshInstance->SetParent(WorldRoot);
 //            }
 //        }
-//
-//        for (int x = 0; x < Width - 1; x++)
-//        {
-//            for(int y = 0; y < Height - 1; y++)
-//            {
-//                std::shared_ptr<Point>> A = VectorOfPoints->at((x) + (y * Width));
-//                std::shared_ptr<Point>> B = VectorOfPoints->at((x+ 1) + (y * Width));
-//                std::shared_ptr<Point>> C = VectorOfPoints->at((x) + ((y+1) * Width));
-//                VectorOfTriangles->push_back(std::shared_ptr<Triangle>>(new Triangle(A, B, C)))
-//            }
-//        }
-//
-//        for (int x = 0; x < Width - 1; x++)
-//        {
-//            for(int y = 0; y < Height - 1; y++)
-//            {
-//                std::shared_ptr<Point>> A = VectorOfPoints->at((x+1) + (y * Width));
-//                std::shared_ptr<Point>> B = VectorOfPoints->at((x+ 1) + ((y+1) * Width));
-//                std::shared_ptr<Point>> C = VectorOfPoints->at((x) + ((y+1) * Width));
-//                VectorOfTriangles->push_back(std::shared_ptr<Triangle>>(new Triangle(A, B, C)))
-//            }
-//        }
-//
-//        MeshInstance = new InstanceHeirachy::MeshInstance
-//        (
-//            World,
-//            std::shared_ptr<Mesh>(PlanarMesh)
-//        );
-//        MeshInstance->SetParent(WorldRoot);
 //
 //        return true;
 //    }
@@ -152,7 +127,7 @@
 //int main()
 //{
 //    UserProgram Program;
-//    if (Program.Start("User Program", 800, 500))
+//    if (Program.Start("User Program", 1000, 800))
 //    {
 //        //Program Successfully Started
 //    }
@@ -162,3 +137,5 @@
 //    }
 //    return 0;
 //}
+//
+

@@ -3,10 +3,9 @@
 //class UserProgram : public Engine
 //{
 //private:
-//    int Width = 500;
-//    int Length = 500;
-//    float Seperation = 0.1f;
-//    InstanceHeirachy::MeshInstance* MeshInstance;
+//    InstanceHeirachy::DirectionalLight* RedLight;
+//    InstanceHeirachy::DirectionalLight* BlueLight;
+//    InstanceHeirachy::DirectionalLight* GreenLight;
 //
 //public:
 //    UserProgram()
@@ -65,19 +64,11 @@
 //        {
 //            Camera->Translate(CameraRotationMatrix * Vector3D(0, 0, DeltaTime));
 //        }
-//        
 //
-//        
-//        std::vector<std::shared_ptr<Point>>* VectorOfPoints = MeshInstance->GetReferenceToMesh().get()->GetPointReferences();
-//        for (int x = 0; x < Width; x++)
-//        {
-//            for(int y = 0; y < Height; y++)
-//            {
-//                float Displacement = sinf(x + y + t);
-//                Vector3D Position = Vector3D((float)x * Seperation, Displacement, (float)y * Seperation);
-//                VectorOfPoints->at(x + (y * Width)).get()->SetPosition(Position);
-//            }
-//        }
+//        BlueLight->SetDirection(Vector3D(sinf(GetRunTime() + 0.666f * PI), 0.0f, cosf(GetRunTime() + 0.6666f * PI)));
+//        RedLight->SetDirection(Vector3D(sinf(GetRunTime() + 1.33333 * PI), 0.0f, cosf(GetRunTime() + 1.333333f * PI)));
+//        GreenLight->SetDirection(Vector3D(sinf(GetRunTime()), 0.0f, cosf(GetRunTime())));
+//
 //    }
 //
 //    bool PostFrame(float DeltaTime) override
@@ -93,50 +84,28 @@
 //
 //        InstanceHeirachy::World* World = GetWorld();
 //        InstanceHeirachy::Instance* WorldRoot = GetWorldRoot();
+//        InstanceHeirachy::Camera* Camera = GetCamera();
+//        Camera->SetMatrix(Matrix4x4::GetRotationMatrix(Vector3D(0, 0, 0)) * Matrix4x4::GetTranslationMatrix(Vector3D(0.0f, 0.0f, 4.0f)));
 //
-//        Mesh* PlanarMesh = new Mesh();
-//        std::vector<std::shared_ptr<Point>>* VectorOfPoints = PlanarMesh->GetPointReferences();
-//        std::vector<std::shared_ptr<Triangle>>* VectorOfTriangles = PlanarMesh->GetTriangleReferences();
+//        RedLight = new InstanceHeirachy::DirectionalLight(World, Vector3D(0, 0, 0));
+//        RedLight->SetLightColour(ColourRGB(255, 0, 0));
+//        RedLight->SetParent(WorldRoot);
 //
-//    
-//        for (int x = 0; x < Width; x++)
-//        {
-//            for(int y = 0; y < Height; y++)
-//            {
-//                Vector3D Position = Vector3D((float)x * Seperation, 0, (float)y * Seperation);
-//                VectorOfPoints->push_back(std::shared_ptr<Point>>(new Point(Position)));
-//            }
-//        }
+//        BlueLight = new InstanceHeirachy::DirectionalLight(World, Vector3D(0, 0, 0));
+//        BlueLight->SetLightColour(ColourRGB(0, 0, 255));
+//        BlueLight->SetParent(WorldRoot);
 //
-//        for (int x = 0; x < Width - 1; x++)
-//        {
-//            for(int y = 0; y < Height - 1; y++)
-//            {
-//                std::shared_ptr<Point>> A = VectorOfPoints->at((x) + (y * Width));
-//                std::shared_ptr<Point>> B = VectorOfPoints->at((x+ 1) + (y * Width));
-//                std::shared_ptr<Point>> C = VectorOfPoints->at((x) + ((y+1) * Width));
-//                VectorOfTriangles->push_back(std::shared_ptr<Triangle>>(new Triangle(A, B, C)))
-//            }
-//        }
+//        GreenLight = new InstanceHeirachy::DirectionalLight(World, Vector3D(0, 0, 0));
+//        GreenLight->SetLightColour(ColourRGB(0, 255, 0));
+//        GreenLight->SetParent(WorldRoot);
 //
-//        for (int x = 0; x < Width - 1; x++)
-//        {
-//            for(int y = 0; y < Height - 1; y++)
-//            {
-//                std::shared_ptr<Point>> A = VectorOfPoints->at((x+1) + (y * Width));
-//                std::shared_ptr<Point>> B = VectorOfPoints->at((x+ 1) + ((y+1) * Width));
-//                std::shared_ptr<Point>> C = VectorOfPoints->at((x) + ((y+1) * Width));
-//                VectorOfTriangles->push_back(std::shared_ptr<Triangle>>(new Triangle(A, B, C)))
-//            }
-//        }
-//
-//        MeshInstance = new InstanceHeirachy::MeshInstance
+//        InstanceHeirachy::MeshInstance* MeshInstance = new InstanceHeirachy::MeshInstance
 //        (
 //            World,
-//            std::shared_ptr<Mesh>(PlanarMesh)
+//            std::shared_ptr<Mesh>(new Mesh("Cube.obj")),
+//            Matrix4x4::GetTranslationMatrix(Vector3D(0, 0, 0))
 //        );
 //        MeshInstance->SetParent(WorldRoot);
-//
 //        return true;
 //    }
 //
@@ -152,7 +121,7 @@
 //int main()
 //{
 //    UserProgram Program;
-//    if (Program.Start("User Program", 800, 500))
+//    if (Program.Start("User Program", 1000, 800))
 //    {
 //        //Program Successfully Started
 //    }
@@ -162,3 +131,5 @@
 //    }
 //    return 0;
 //}
+//
+//

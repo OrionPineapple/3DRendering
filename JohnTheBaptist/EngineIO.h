@@ -56,7 +56,7 @@
 // | olcPixelGameEngine INTERFACE DECLARATION                                     |
 // O------------------------------------------------------------------------------O
 #pragma region pge_declaration
-namespace olc
+namespace EngineIO
 {
 	class PixelGameEngine;
 	class Sprite;
@@ -69,7 +69,7 @@ namespace olc
 	enum rcode { FAIL = 0, OK = 1, NO_FILE = -1 };
 
 	// O------------------------------------------------------------------------------O
-	// | olc::Pixel - Represents a 32-Bit RGBA colour                                 |
+	// | EngineIO::Pixel - Represents a 32-Bit RGBA colour                                 |
 	// O------------------------------------------------------------------------------O
 	struct Pixel
 	{
@@ -99,7 +99,7 @@ namespace olc
 	};
 
 	Pixel PixelF(float red, float green, float blue, float alpha = 1.0f);
-	Pixel PixelLerp(const olc::Pixel& p1, const olc::Pixel& p2, float t);
+	Pixel PixelLerp(const EngineIO::Pixel& p1, const EngineIO::Pixel& p2, float t);
 
 
 	// O------------------------------------------------------------------------------O
@@ -141,7 +141,7 @@ namespace olc
 	};
 
 	// O------------------------------------------------------------------------------O
-	// | olc::HWButton - Represents the state of a hardware button (mouse/key/joy)    |
+	// | EngineIO::HWButton - Represents the state of a hardware button (mouse/key/joy)    |
 	// O------------------------------------------------------------------------------O
 	struct HWButton
 	{
@@ -154,7 +154,7 @@ namespace olc
 
 
 	// O------------------------------------------------------------------------------O
-	// | olc::vX2d - A generic 2D vector type                                         |
+	// | EngineIO::vX2d - A generic 2D vector type                                         |
 	// O------------------------------------------------------------------------------O
 	template <class T>
 	struct v2d_generic
@@ -243,7 +243,7 @@ namespace olc
 	typedef v2d_generic<double> vd2d;
 
 	// O------------------------------------------------------------------------------O
-	// | olc::ResourcePack - A virtual scrambled filesystem to pack your assets into  |
+	// | EngineIO::ResourcePack - A virtual scrambled filesystem to pack your assets into  |
 	// O------------------------------------------------------------------------------O
 	
 	class ImageLoader
@@ -251,19 +251,19 @@ namespace olc
 	public:
 		ImageLoader() = default;
 		virtual ~ImageLoader() = default;
-		virtual olc::rcode SaveImageResource(olc::Sprite* spr, const std::string& sImageFile) = 0;
+		virtual EngineIO::rcode SaveImageResource(EngineIO::Sprite* spr, const std::string& sImageFile) = 0;
 	};
 
 
 	// O------------------------------------------------------------------------------O
-	// | olc::Sprite - An image represented by a 2D array of olc::Pixel               |
+	// | EngineIO::Sprite - An image represented by a 2D array of EngineIO::Pixel               |
 	// O------------------------------------------------------------------------------O
 	class Sprite
 	{
 	public:
 		Sprite();
 		Sprite(int32_t w, int32_t h);
-		Sprite(const olc::Sprite&) = delete;
+		Sprite(const EngineIO::Sprite&) = delete;
 		~Sprite();
 
 	public:
@@ -273,38 +273,38 @@ namespace olc
 		enum Flip { NONE = 0, HORIZ = 1, VERT = 2 };
 
 	public:
-		void SetSampleMode(olc::Sprite::Mode mode = olc::Sprite::Mode::NORMAL);
+		void SetSampleMode(EngineIO::Sprite::Mode mode = EngineIO::Sprite::Mode::NORMAL);
 		Pixel GetPixel(int32_t x, int32_t y) const;
 		bool  SetPixel(int32_t x, int32_t y, Pixel p);
-		Pixel GetPixel(const olc::vi2d& a) const;
-		bool  SetPixel(const olc::vi2d& a, Pixel p);
+		Pixel GetPixel(const EngineIO::vi2d& a) const;
+		bool  SetPixel(const EngineIO::vi2d& a, Pixel p);
 		Pixel Sample(float x, float y) const;
 		Pixel SampleBL(float u, float v) const;
 		Pixel* GetData();
-		olc::Sprite* Duplicate();
-		olc::Sprite* Duplicate(const olc::vi2d& vPos, const olc::vi2d& vSize);
-		std::vector<olc::Pixel> pColData;
+		EngineIO::Sprite* Duplicate();
+		EngineIO::Sprite* Duplicate(const EngineIO::vi2d& vPos, const EngineIO::vi2d& vSize);
+		std::vector<EngineIO::Pixel> pColData;
 		Mode modeSample = Mode::NORMAL;
 
-		static std::unique_ptr<olc::ImageLoader> loader;
+		static std::unique_ptr<EngineIO::ImageLoader> loader;
 	};
 
 	// O------------------------------------------------------------------------------O
-	// | olc::Decal - A GPU resident storage of an olc::Sprite                        |
+	// | EngineIO::Decal - A GPU resident storage of an EngineIO::Sprite                        |
 	// O------------------------------------------------------------------------------O
 	class Decal
 	{
 	public:
-		Decal(olc::Sprite* spr, bool filter = false, bool clamp = true);
-		Decal(const uint32_t nExistingTextureResource, olc::Sprite* spr);
+		Decal(EngineIO::Sprite* spr, bool filter = false, bool clamp = true);
+		Decal(const uint32_t nExistingTextureResource, EngineIO::Sprite* spr);
 		virtual ~Decal();
 		void Update();
 		void UpdateSprite();
 
 	public: // But dont touch
 		int32_t id = -1;
-		olc::Sprite* sprite = nullptr;
-		olc::vf2d vUVScale = { 1.0f, 1.0f };
+		EngineIO::Sprite* sprite = nullptr;
+		EngineIO::vf2d vUVScale = { 1.0f, 1.0f };
 	};
 
 	enum class DecalMode
@@ -327,7 +327,7 @@ namespace olc
 	};
 
 	// O------------------------------------------------------------------------------O
-	// | olc::Renderable - Convenience class to keep a sprite and decal together      |
+	// | EngineIO::Renderable - Convenience class to keep a sprite and decal together      |
 	// O------------------------------------------------------------------------------O
 	class Renderable
 	{
@@ -336,12 +336,12 @@ namespace olc
 		Renderable(Renderable&& r) : pSprite(std::move(r.pSprite)), pDecal(std::move(r.pDecal)) {}
 		Renderable(const Renderable&) = delete;
 		void Create(uint32_t width, uint32_t height, bool filter = false, bool clamp = true);
-		olc::Decal* Decal() const;
-		olc::Sprite* Sprite() const;
+		EngineIO::Decal* Decal() const;
+		EngineIO::Sprite* Sprite() const;
 
 	private:
-		std::unique_ptr<olc::Sprite> pSprite = nullptr;
-		std::unique_ptr<olc::Decal> pDecal = nullptr;
+		std::unique_ptr<EngineIO::Sprite> pSprite = nullptr;
+		std::unique_ptr<EngineIO::Decal> pDecal = nullptr;
 	};
 
 
@@ -351,12 +351,12 @@ namespace olc
 
 	struct DecalInstance
 	{
-		olc::Decal* decal = nullptr;
-		std::vector<olc::vf2d> pos;
-		std::vector<olc::vf2d> uv;
+		EngineIO::Decal* decal = nullptr;
+		std::vector<EngineIO::vf2d> pos;
+		std::vector<EngineIO::vf2d> uv;
 		std::vector<float> w;
-		olc::DecalMode mode = olc::DecalMode::NORMAL;
-		olc::DecalStructure structure = olc::DecalStructure::FAN;
+		EngineIO::DecalMode mode = EngineIO::DecalMode::NORMAL;
+		EngineIO::DecalStructure structure = EngineIO::DecalStructure::FAN;
 		uint32_t points = 0;
 	};
 
@@ -364,7 +364,7 @@ namespace olc
 	{
 		bool bShow = false;
 		bool bUpdate = false;
-		olc::Renderable pDrawTarget;
+		EngineIO::Renderable pDrawTarget;
 		uint32_t nResID = 0;
 		std::function<void()> funcHook = nullptr;
 	};
@@ -374,35 +374,35 @@ namespace olc
 	public:
 		virtual ~Renderer() = default;
 		virtual void       PrepareDevice() = 0;
-		virtual olc::rcode CreateDevice(std::vector<void*> params, bool bFullScreen, bool bVSYNC) = 0;
-		virtual olc::rcode DestroyDevice() = 0;
+		virtual EngineIO::rcode CreateDevice(std::vector<void*> params, bool bFullScreen, bool bVSYNC) = 0;
+		virtual EngineIO::rcode DestroyDevice() = 0;
 		virtual void       DisplayFrame() = 0;
 		virtual void       PrepareDrawing() = 0;
 		virtual void       DrawLayerQuad() = 0;
 		virtual uint32_t   CreateTexture(const uint32_t width, const uint32_t height, const bool filtered = false, const bool clamp = true) = 0;
-		virtual void       UpdateTexture(uint32_t id, olc::Sprite* spr) = 0;
-		virtual void       ReadTexture(uint32_t id, olc::Sprite* spr) = 0;
+		virtual void       UpdateTexture(uint32_t id, EngineIO::Sprite* spr) = 0;
+		virtual void       ReadTexture(uint32_t id, EngineIO::Sprite* spr) = 0;
 		virtual uint32_t   DeleteTexture(const uint32_t id) = 0;
 		virtual void       ApplyTexture(uint32_t id) = 0;
-		virtual void       UpdateViewport(const olc::vi2d& pos, const olc::vi2d& size) = 0;
-		virtual void       ClearBuffer(olc::Pixel p, bool bDepth) = 0;
-		static olc::PixelGameEngine* ptrPGE;
+		virtual void       UpdateViewport(const EngineIO::vi2d& pos, const EngineIO::vi2d& size) = 0;
+		virtual void       ClearBuffer(EngineIO::Pixel p, bool bDepth) = 0;
+		static EngineIO::PixelGameEngine* ptrPGE;
 	};
 
 	class Platform
 	{
 	public:
 		virtual ~Platform() = default;
-		virtual olc::rcode ApplicationStartUp() = 0;
-		virtual olc::rcode ApplicationCleanUp() = 0;
-		virtual olc::rcode ThreadStartUp() = 0;
-		virtual olc::rcode ThreadCleanUp() = 0;
-		virtual olc::rcode CreateGraphics(bool bFullScreen, bool bEnableVSYNC, const olc::vi2d& vViewPos, const olc::vi2d& vViewSize) = 0;
-		virtual olc::rcode CreateWindowPane(const olc::vi2d& vWindowPos, olc::vi2d& vWindowSize, bool bFullScreen) = 0;
-		virtual olc::rcode SetWindowTitle(const std::string& s) = 0;
-		virtual olc::rcode StartSystemEventLoop() = 0;
-		virtual olc::rcode HandleSystemEvent() = 0;
-		static olc::PixelGameEngine* ptrPGE;
+		virtual EngineIO::rcode ApplicationStartUp() = 0;
+		virtual EngineIO::rcode ApplicationCleanUp() = 0;
+		virtual EngineIO::rcode ThreadStartUp() = 0;
+		virtual EngineIO::rcode ThreadCleanUp() = 0;
+		virtual EngineIO::rcode CreateGraphics(bool bFullScreen, bool bEnableVSYNC, const EngineIO::vi2d& vViewPos, const EngineIO::vi2d& vViewSize) = 0;
+		virtual EngineIO::rcode CreateWindowPane(const EngineIO::vi2d& vWindowPos, EngineIO::vi2d& vWindowSize, bool bFullScreen) = 0;
+		virtual EngineIO::rcode SetWindowTitle(const std::string& s) = 0;
+		virtual EngineIO::rcode StartSystemEventLoop() = 0;
+		virtual EngineIO::rcode HandleSystemEvent() = 0;
+		static EngineIO::PixelGameEngine* ptrPGE;
 	};
 
 	class PGEX;
@@ -413,7 +413,7 @@ namespace olc
 	static std::map<size_t, uint8_t> mapKeys;
 
 	// O------------------------------------------------------------------------------O
-	// | olc::PixelGameEngine - The main BASE class for your application              |
+	// | EngineIO::PixelGameEngine - The main BASE class for your application              |
 	// O------------------------------------------------------------------------------O
 	class PixelGameEngine
 	{
@@ -421,9 +421,9 @@ namespace olc
 		PixelGameEngine();
 		virtual ~PixelGameEngine();
 	public:
-		olc::rcode Construct(int32_t screen_w, int32_t screen_h, int32_t pixel_w, int32_t pixel_h,
+		EngineIO::rcode Construct(int32_t screen_w, int32_t screen_h, int32_t pixel_w, int32_t pixel_h,
 			bool full_screen = false, bool vsync = false, bool cohesion = false);
-		olc::rcode Start();
+		EngineIO::rcode Start();
 
 	public:
 		// Called once on application startup, use to load your resources
@@ -447,9 +447,9 @@ namespace olc
 		// Get Mouse Wheel Delta
 		int32_t GetMouseWheel() const;
 		// Get the mouse in window space
-		const olc::vi2d& GetWindowMouse() const;
+		const EngineIO::vi2d& GetWindowMouse() const;
 		// Gets the mouse as a vector to keep Tarriest happy
-		const olc::vi2d& GetMousePos() const;
+		const EngineIO::vi2d& GetMousePos() const;
 
 		static const std::map<size_t, uint8_t>& GetKeyMap() { return mapKeys; }
 
@@ -458,14 +458,14 @@ namespace olc
 		int32_t ScreenHeight() const;
 		int32_t GetDrawTargetWidth() const;
 		int32_t GetDrawTargetHeight() const;
-		olc::Sprite* GetDrawTarget() const;
+		EngineIO::Sprite* GetDrawTarget() const;
 		void SetScreenSize(int w, int h);
 		void SetDrawTarget(Sprite* target);
 		uint32_t GetFPS() const;
 		float GetElapsedTime() const;
-		const olc::vi2d& GetWindowSize() const;
-		const olc::vi2d& GetPixelSize() const;
-		const olc::vi2d& GetScreenPixelSize() const;
+		const EngineIO::vi2d& GetWindowSize() const;
+		const EngineIO::vi2d& GetPixelSize() const;
+		const EngineIO::vi2d& GetScreenPixelSize() const;
 
 		//Alex Added
 		int32_t GetMaxFPS() const;
@@ -474,9 +474,10 @@ namespace olc
 	public: // CONFIGURATION ROUTINES
 
 	public: // DRAWING ROUTINES
-		virtual bool Draw(int32_t x, int32_t y, Pixel p = olc::WHITE);
-		bool Draw(const olc::vi2d& pos, Pixel p = olc::WHITE);
-		void DrawDecal(const olc::vf2d& pos, olc::Decal* decal, const olc::vf2d& scale = { 1.0f,1.0f });
+		virtual bool Draw(int32_t x, int32_t y, Pixel p = EngineIO::WHITE);
+        Pixel GetDrawn(int32_t x, int32_t y);
+		bool Draw(const EngineIO::vi2d& pos, Pixel p = EngineIO::WHITE);
+		void DrawDecal(const EngineIO::vf2d& pos, EngineIO::Decal* decal, const EngineIO::vf2d& scale = { 1.0f,1.0f });
 		void Clear(Pixel p);
 		void ClearBuffer(Pixel p, bool bDepth = true);
 
@@ -484,22 +485,22 @@ namespace olc
 		std::string sAppName;
 
 	private: // Inner mysterious workings
-		olc::Sprite* pDrawTarget = nullptr;
+		EngineIO::Sprite* pDrawTarget = nullptr;
 		float		fBlendFactor = 1.0f;
-		olc::vi2d	vScreenSize = { 256, 240 };
-		olc::vf2d	vInvScreenSize = { 1.0f / 256.0f, 1.0f / 240.0f };
-		olc::vi2d	vPixelSize = { 4, 4 };
-		olc::vi2d   vScreenPixelSize = { 4, 4 };
-		olc::vi2d	vMousePos = { 0, 0 };
+		EngineIO::vi2d	vScreenSize = { 256, 240 };
+		EngineIO::vf2d	vInvScreenSize = { 1.0f / 256.0f, 1.0f / 240.0f };
+		EngineIO::vi2d	vPixelSize = { 4, 4 };
+		EngineIO::vi2d   vScreenPixelSize = { 4, 4 };
+		EngineIO::vi2d	vMousePos = { 0, 0 };
 		int32_t		nMouseWheelDelta = 0;
-		olc::vi2d	vMousePosCache = { 0, 0 };
-		olc::vi2d   vMouseWindowPos = { 0, 0 };
+		EngineIO::vi2d	vMousePosCache = { 0, 0 };
+		EngineIO::vi2d   vMouseWindowPos = { 0, 0 };
 		int32_t		nMouseWheelDeltaCache = 0;
-		olc::vi2d	vWindowSize = { 0, 0 };
-		olc::vi2d	vViewPos = { 0, 0 };
-		olc::vi2d	vViewSize = { 0,0 };
+		EngineIO::vi2d	vWindowSize = { 0, 0 };
+		EngineIO::vi2d	vViewPos = { 0, 0 };
+		EngineIO::vi2d	vViewSize = { 0,0 };
 		bool		bFullScreen = false;
-		olc::vf2d	vPixel = { 1.0f, 1.0f };
+		EngineIO::vf2d	vPixel = { 1.0f, 1.0f };
 		bool		bHasInputFocus = false;
 		bool		bHasMouseFocus = false;
 		bool		bEnableVSYNC = false;
@@ -518,12 +519,12 @@ namespace olc
 		bool        bPixelCohesion = false;
 		DecalMode   nDecalMode = DecalMode::NORMAL;
 		DecalStructure nDecalStructure = DecalStructure::FAN;
-		std::function<olc::Pixel(const int x, const int y, const olc::Pixel&, const olc::Pixel&)> funcPixelMode;
+		std::function<EngineIO::Pixel(const int x, const int y, const EngineIO::Pixel&, const EngineIO::Pixel&)> funcPixelMode;
 		std::chrono::time_point<std::chrono::system_clock> m_tp1, m_tp2;
-		std::vector<olc::vi2d> vFontSpacing;
+		std::vector<EngineIO::vi2d> vFontSpacing;
 
 		// Text Entry Specific
-		std::vector<std::tuple<olc::Key, std::string, std::string>> vKeyboardMap;
+		std::vector<std::tuple<EngineIO::Key, std::string, std::string>> vKeyboardMap;
 
 
 
@@ -568,14 +569,14 @@ namespace olc
 
 		// NOTE: Items Here are to be deprecated, I have left them in for now
 		// in case you are using them, but they will be removed.
-		// olc::vf2d	vSubPixelOffset = { 0.0f, 0.0f };
+		// EngineIO::vf2d	vSubPixelOffset = { 0.0f, 0.0f };
 
 	public: // PGEX Stuff
 		friend class PGEX;
-		void pgex_Register(olc::PGEX* pgex);
+		void pgex_Register(EngineIO::PGEX* pgex);
 
 	private:
-		std::vector<olc::PGEX*> vExtensions;
+		std::vector<EngineIO::PGEX*> vExtensions;
 	};
 
 
@@ -585,7 +586,7 @@ namespace olc
 	// O------------------------------------------------------------------------------O
 	class PGEX
 	{
-		friend class olc::PixelGameEngine;
+		friend class EngineIO::PixelGameEngine;
 	public:
 		PGEX(bool bHook = false);
 
@@ -604,7 +605,7 @@ namespace olc
 
 
 #pragma region pge_implementation
-namespace olc
+namespace EngineIO
 {
 
 #pragma region pixel 
@@ -710,7 +711,7 @@ namespace olc
 		return Pixel(uint8_t(red * 255.0f), uint8_t(green * 255.0f), uint8_t(blue * 255.0f), uint8_t(alpha * 255.0f));
 	}
 
-	Pixel PixelLerp(const olc::Pixel& p1, const olc::Pixel& p2, float t)
+	Pixel PixelLerp(const EngineIO::Pixel& p1, const EngineIO::Pixel& p2, float t)
 	{
 		return (p2 * t) + p1 * (1.0f - t);
 	}
@@ -735,24 +736,24 @@ namespace olc
 		pColData.clear();
 	}
 
-	void Sprite::SetSampleMode(olc::Sprite::Mode mode)
+	void Sprite::SetSampleMode(EngineIO::Sprite::Mode mode)
 	{
 		modeSample = mode;
 	}
 
-	Pixel Sprite::GetPixel(const olc::vi2d& a) const
+	Pixel Sprite::GetPixel(const EngineIO::vi2d& a) const
 	{
 		return GetPixel(a.x, a.y);
 	}
 
-	bool Sprite::SetPixel(const olc::vi2d& a, Pixel p)
+	bool Sprite::SetPixel(const EngineIO::vi2d& a, Pixel p)
 	{
 		return SetPixel(a.x, a.y, p);
 	}
 
 	Pixel Sprite::GetPixel(int32_t x, int32_t y) const
 	{
-		if (modeSample == olc::Sprite::Mode::NORMAL)
+		if (modeSample == EngineIO::Sprite::Mode::NORMAL)
 		{
 			if (x >= 0 && x < width && y >= 0 && y < height)
 				return pColData[y * width + x];
@@ -761,7 +762,7 @@ namespace olc
 		}
 		else
 		{
-			if (modeSample == olc::Sprite::Mode::PERIODIC)
+			if (modeSample == EngineIO::Sprite::Mode::PERIODIC)
 				return pColData[abs(y % height) * width + abs(x % width)];
 			else
 				return pColData[std::max(0, std::min(y, height - 1)) * width + std::max(0, std::min(x, width - 1))];
@@ -797,12 +798,12 @@ namespace olc
 		float u_opposite = 1 - u_ratio;
 		float v_opposite = 1 - v_ratio;
 
-		olc::Pixel p1 = GetPixel(std::max(x, 0), std::max(y, 0));
-		olc::Pixel p2 = GetPixel(std::min(x + 1, (int)width - 1), std::max(y, 0));
-		olc::Pixel p3 = GetPixel(std::max(x, 0), std::min(y + 1, (int)height - 1));
-		olc::Pixel p4 = GetPixel(std::min(x + 1, (int)width - 1), std::min(y + 1, (int)height - 1));
+		EngineIO::Pixel p1 = GetPixel(std::max(x, 0), std::max(y, 0));
+		EngineIO::Pixel p2 = GetPixel(std::min(x + 1, (int)width - 1), std::max(y, 0));
+		EngineIO::Pixel p3 = GetPixel(std::max(x, 0), std::min(y + 1, (int)height - 1));
+		EngineIO::Pixel p4 = GetPixel(std::min(x + 1, (int)width - 1), std::min(y + 1, (int)height - 1));
 
-		return olc::Pixel(
+		return EngineIO::Pixel(
 			(uint8_t)((p1.r * u_opposite + p2.r * u_ratio) * v_opposite + (p3.r * u_opposite + p4.r * u_ratio) * v_ratio),
 			(uint8_t)((p1.g * u_opposite + p2.g * u_ratio) * v_opposite + (p3.g * u_opposite + p4.g * u_ratio) * v_ratio),
 			(uint8_t)((p1.b * u_opposite + p2.b * u_ratio) * v_opposite + (p3.b * u_opposite + p4.b * u_ratio) * v_ratio));
@@ -813,17 +814,17 @@ namespace olc
 		return pColData.data();
 	}
 
-	olc::Sprite* Sprite::Duplicate()
+	EngineIO::Sprite* Sprite::Duplicate()
 	{
-		olc::Sprite* spr = new olc::Sprite(width, height);
-		std::memcpy(spr->GetData(), GetData(), width * height * sizeof(olc::Pixel));
+		EngineIO::Sprite* spr = new EngineIO::Sprite(width, height);
+		std::memcpy(spr->GetData(), GetData(), width * height * sizeof(EngineIO::Pixel));
 		spr->modeSample = modeSample;
 		return spr;
 	}
 
-	olc::Sprite* Sprite::Duplicate(const olc::vi2d& vPos, const olc::vi2d& vSize)
+	EngineIO::Sprite* Sprite::Duplicate(const EngineIO::vi2d& vPos, const EngineIO::vi2d& vSize)
 	{
-		olc::Sprite* spr = new olc::Sprite(vSize.x, vSize.y);
+		EngineIO::Sprite* spr = new EngineIO::Sprite(vSize.x, vSize.y);
 		for (int y = 0; y < vSize.y; y++)
 			for (int x = 0; x < vSize.x; x++)
 				spr->SetPixel(x, y, GetPixel(vPos.x + x, vPos.y + y));
@@ -833,7 +834,7 @@ namespace olc
 #pragma endregion sprite
 
 #pragma region decal
-	Decal::Decal(olc::Sprite* spr, bool filter, bool clamp)
+	Decal::Decal(EngineIO::Sprite* spr, bool filter, bool clamp)
 	{
 		id = -1;
 		if (spr == nullptr) return;
@@ -842,7 +843,7 @@ namespace olc
 		Update();
 	}
 
-	Decal::Decal(const uint32_t nExistingTextureResource, olc::Sprite* spr)
+	Decal::Decal(const uint32_t nExistingTextureResource, EngineIO::Sprite* spr)
 	{
 		if (spr == nullptr) return;
 		id = nExistingTextureResource;
@@ -874,16 +875,16 @@ namespace olc
 
 	void Renderable::Create(uint32_t width, uint32_t height, bool filter, bool clamp)
 	{
-		pSprite = std::make_unique<olc::Sprite>(width, height);
-		pDecal = std::make_unique<olc::Decal>(pSprite.get(), filter, clamp);
+		pSprite = std::make_unique<EngineIO::Sprite>(width, height);
+		pDecal = std::make_unique<EngineIO::Decal>(pSprite.get(), filter, clamp);
 	}
 
-	olc::Decal* Renderable::Decal() const
+	EngineIO::Decal* Renderable::Decal() const
 	{
 		return pDecal.get();
 	}
 
-	olc::Sprite* Renderable::Sprite() const
+	EngineIO::Sprite* Renderable::Sprite() const
 	{
 		return pSprite.get();
 	}
@@ -893,7 +894,7 @@ namespace olc
 	PixelGameEngine::PixelGameEngine()
 	{
 		sAppName = "Undefined";
-		olc::PGEX::pge = this;
+		EngineIO::PGEX::pge = this;
 
 		// Bring in relevant Platform & Rendering systems depending
 		// on compiler parameters
@@ -905,7 +906,7 @@ namespace olc
 	
 	}
 
-	olc::rcode PixelGameEngine::Construct(int32_t screen_w, int32_t screen_h, int32_t pixel_w, int32_t pixel_h, bool full_screen, bool vsync, bool cohesion)
+	EngineIO::rcode PixelGameEngine::Construct(int32_t screen_w, int32_t screen_h, int32_t pixel_w, int32_t pixel_h, bool full_screen, bool vsync, bool cohesion)
 	{
 		bPixelCohesion = cohesion;
 		vScreenSize = { screen_w, screen_h };
@@ -917,8 +918,8 @@ namespace olc
 		vPixel = 2.0f / vScreenSize;
 
 		if (vPixelSize.x <= 0 || vPixelSize.y <= 0 || vScreenSize.x <= 0 || vScreenSize.y <= 0)
-			return olc::FAIL;
-		return olc::OK;
+			return EngineIO::FAIL;
+		return EngineIO::OK;
 	}
 
 
@@ -929,9 +930,9 @@ namespace olc
 		BaseLayer.pDrawTarget.Create(vScreenSize.x, vScreenSize.y);
 		BaseLayer.bUpdate = true;
 		SetDrawTarget(nullptr);
-		renderer->ClearBuffer(olc::BLACK, true);
+		renderer->ClearBuffer(EngineIO::BLACK, true);
 		renderer->DisplayFrame();
-		renderer->ClearBuffer(olc::BLACK, true);
+		renderer->ClearBuffer(EngineIO::BLACK, true);
 		renderer->UpdateViewport(vViewPos, vViewSize);
 	}
 
@@ -950,12 +951,12 @@ namespace olc
 		maxFPS = fps;
 	}
 
-	olc::rcode PixelGameEngine::Start()
+	EngineIO::rcode PixelGameEngine::Start()
 	{
-		if (platform->ApplicationStartUp() != olc::OK) return olc::FAIL;
+		if (platform->ApplicationStartUp() != EngineIO::OK) return EngineIO::FAIL;
 
 		// Construct the window
-		if (platform->CreateWindowPane({ 30,30 }, vWindowSize, bFullScreen) != olc::OK) return olc::FAIL;
+		if (platform->CreateWindowPane({ 30,30 }, vWindowSize, bFullScreen) != EngineIO::OK) return EngineIO::FAIL;
 		olc_UpdateWindowSize(vWindowSize.x, vWindowSize.y);
 
 		// Start the thread
@@ -968,9 +969,9 @@ namespace olc
 		// Wait for thread to be exited
 		t.join();
 
-		if (platform->ApplicationCleanUp() != olc::OK) return olc::FAIL;
+		if (platform->ApplicationCleanUp() != EngineIO::OK) return EngineIO::FAIL;
 
-		return olc::OK;
+		return EngineIO::OK;
 	}
 	void PixelGameEngine::SetDrawTarget(Sprite* target)
 	{
@@ -1010,15 +1011,15 @@ namespace olc
 
 	HWButton PixelGameEngine::GetKey(Key k) const
 	{
-        if (k == olc::Key::MouseLeft)
+        if (k == EngineIO::Key::MouseLeft)
         {
             return pMouseState[0];
         }
-        else if (k == olc::Key::MouseMiddle)
+        else if (k == EngineIO::Key::MouseMiddle)
         {
             return pMouseState[2];
         }
-        else if (k == olc::Key::MouseRight)
+        else if (k == EngineIO::Key::MouseRight)
         {
             return pMouseState[1];
         }
@@ -1041,7 +1042,7 @@ namespace olc
 		return vMousePos.y;
 	}
 
-	const olc::vi2d& PixelGameEngine::GetMousePos() const
+	const EngineIO::vi2d& PixelGameEngine::GetMousePos() const
 	{
 		return vMousePos;
 	}
@@ -1066,27 +1067,27 @@ namespace olc
 		return fLastElapsed;
 	}
 
-	const olc::vi2d& PixelGameEngine::GetWindowSize() const
+	const EngineIO::vi2d& PixelGameEngine::GetWindowSize() const
 	{
 		return vWindowSize;
 	}
 
-	const olc::vi2d& PixelGameEngine::GetPixelSize() const
+	const EngineIO::vi2d& PixelGameEngine::GetPixelSize() const
 	{
 		return vPixelSize;
 	}
 
-	const olc::vi2d& PixelGameEngine::GetScreenPixelSize() const
+	const EngineIO::vi2d& PixelGameEngine::GetScreenPixelSize() const
 	{
 		return vScreenPixelSize;
 	}
 
-	const olc::vi2d& PixelGameEngine::GetWindowMouse() const
+	const EngineIO::vi2d& PixelGameEngine::GetWindowMouse() const
 	{
 		return vMouseWindowPos;
 	}
 
-	bool PixelGameEngine::Draw(const olc::vi2d& pos, Pixel p)
+	bool PixelGameEngine::Draw(const EngineIO::vi2d& pos, Pixel p)
 	{
 		return Draw(pos.x, pos.y, p);
 	}
@@ -1100,6 +1101,11 @@ namespace olc
 
 		return false;
 	}
+
+    Pixel PixelGameEngine::GetDrawn(int32_t x, int32_t y)
+    {
+        return pDrawTarget->GetPixel(x, y);
+    }
 
 	void PixelGameEngine::Clear(Pixel p)
 	{
@@ -1207,7 +1213,7 @@ namespace olc
 	{
 		// Allow platform to do stuff here if needed, since its now in the
 		// context of this thread
-		if (platform->ThreadStartUp() == olc::FAIL)	return;
+		if (platform->ThreadStartUp() == EngineIO::FAIL)	return;
 
 		// Do engine context specific initialisation
 		olc_PrepareEngine();
@@ -1236,7 +1242,7 @@ namespace olc
 	void PixelGameEngine::olc_PrepareEngine()
 	{
 		// Start OpenGL, the context is owned by the game thread
-		if (platform->CreateGraphics(bFullScreen, bEnableVSYNC, vViewPos, vViewSize) == olc::FAIL) return;
+		if (platform->CreateGraphics(bFullScreen, bEnableVSYNC, vViewPos, vViewSize) == EngineIO::FAIL) return;
 
 		// Construct default font sheet
 		olc_ConstructFontSheet();
@@ -1327,7 +1333,7 @@ namespace olc
 
 		// Display Frame
 		renderer->UpdateViewport(vViewPos, vViewSize);
-		renderer->ClearBuffer(olc::BLACK, true);
+		renderer->ClearBuffer(EngineIO::BLACK, true);
 		
 		// Layer 0 must always exist
 		BaseLayer.bUpdate = true;
@@ -1404,7 +1410,7 @@ namespace olc
 			for (int i = 0; i < 24; i++)
 			{
 				int k = r & (1 << i) ? 255 : 0;
-				fontRenderable.Sprite()->SetPixel(px, py, olc::Pixel(k, k, k, k));
+				fontRenderable.Sprite()->SetPixel(px, py, EngineIO::Pixel(k, k, k, k));
 				if (++py == 48) { px++; py = 0; }
 			}
 		}
@@ -1424,30 +1430,30 @@ namespace olc
 		// UK Standard Layout
 		vKeyboardMap =
 		{
-			{olc::Key::A, "a", "A"}, {olc::Key::B, "b", "B"}, {olc::Key::C, "c", "C"}, {olc::Key::D, "d", "D"}, {olc::Key::E, "e", "E"},
-			{olc::Key::F, "f", "F"}, {olc::Key::G, "g", "G"}, {olc::Key::H, "h", "H"}, {olc::Key::I, "i", "I"}, {olc::Key::J, "j", "J"},
-			{olc::Key::K, "k", "K"}, {olc::Key::L, "l", "L"}, {olc::Key::M, "m", "M"}, {olc::Key::N, "n", "N"}, {olc::Key::O, "o", "O"},
-			{olc::Key::P, "p", "P"}, {olc::Key::Q, "q", "Q"}, {olc::Key::R, "r", "R"}, {olc::Key::S, "s", "S"}, {olc::Key::T, "t", "T"},
-			{olc::Key::U, "u", "U"}, {olc::Key::V, "v", "V"}, {olc::Key::W, "w", "W"}, {olc::Key::X, "x", "X"}, {olc::Key::Y, "y", "Y"},
-			{olc::Key::Z, "z", "Z"},
+			{EngineIO::Key::A, "a", "A"}, {EngineIO::Key::B, "b", "B"}, {EngineIO::Key::C, "c", "C"}, {EngineIO::Key::D, "d", "D"}, {EngineIO::Key::E, "e", "E"},
+			{EngineIO::Key::F, "f", "F"}, {EngineIO::Key::G, "g", "G"}, {EngineIO::Key::H, "h", "H"}, {EngineIO::Key::I, "i", "I"}, {EngineIO::Key::J, "j", "J"},
+			{EngineIO::Key::K, "k", "K"}, {EngineIO::Key::L, "l", "L"}, {EngineIO::Key::M, "m", "M"}, {EngineIO::Key::N, "n", "N"}, {EngineIO::Key::O, "o", "O"},
+			{EngineIO::Key::P, "p", "P"}, {EngineIO::Key::Q, "q", "Q"}, {EngineIO::Key::R, "r", "R"}, {EngineIO::Key::S, "s", "S"}, {EngineIO::Key::T, "t", "T"},
+			{EngineIO::Key::U, "u", "U"}, {EngineIO::Key::V, "v", "V"}, {EngineIO::Key::W, "w", "W"}, {EngineIO::Key::X, "x", "X"}, {EngineIO::Key::Y, "y", "Y"},
+			{EngineIO::Key::Z, "z", "Z"},
 
-			{olc::Key::K0, "0", ")"}, {olc::Key::K1, "1", "!"}, {olc::Key::K2, "2", "\""}, {olc::Key::K3, "3", "#"},	{olc::Key::K4, "4", "$"},
-			{olc::Key::K5, "5", "%"}, {olc::Key::K6, "6", "^"}, {olc::Key::K7, "7", "&"}, {olc::Key::K8, "8", "*"},	{olc::Key::K9, "9", "("},
+			{EngineIO::Key::K0, "0", ")"}, {EngineIO::Key::K1, "1", "!"}, {EngineIO::Key::K2, "2", "\""}, {EngineIO::Key::K3, "3", "#"},	{EngineIO::Key::K4, "4", "$"},
+			{EngineIO::Key::K5, "5", "%"}, {EngineIO::Key::K6, "6", "^"}, {EngineIO::Key::K7, "7", "&"}, {EngineIO::Key::K8, "8", "*"},	{EngineIO::Key::K9, "9", "("},
 
-			{olc::Key::NP0, "0", "0"}, {olc::Key::NP1, "1", "1"}, {olc::Key::NP2, "2", "2"}, {olc::Key::NP3, "3", "3"},	{olc::Key::NP4, "4", "4"},
-			{olc::Key::NP5, "5", "5"}, {olc::Key::NP6, "6", "6"}, {olc::Key::NP7, "7", "7"}, {olc::Key::NP8, "8", "8"},	{olc::Key::NP9, "9", "9"},
-			{olc::Key::NP_MUL, "*", "*"}, {olc::Key::NP_DIV, "/", "/"}, {olc::Key::NP_ADD, "+", "+"}, {olc::Key::NP_SUB, "-", "-"},	{olc::Key::NP_DECIMAL, ".", "."},
+			{EngineIO::Key::NP0, "0", "0"}, {EngineIO::Key::NP1, "1", "1"}, {EngineIO::Key::NP2, "2", "2"}, {EngineIO::Key::NP3, "3", "3"},	{EngineIO::Key::NP4, "4", "4"},
+			{EngineIO::Key::NP5, "5", "5"}, {EngineIO::Key::NP6, "6", "6"}, {EngineIO::Key::NP7, "7", "7"}, {EngineIO::Key::NP8, "8", "8"},	{EngineIO::Key::NP9, "9", "9"},
+			{EngineIO::Key::NP_MUL, "*", "*"}, {EngineIO::Key::NP_DIV, "/", "/"}, {EngineIO::Key::NP_ADD, "+", "+"}, {EngineIO::Key::NP_SUB, "-", "-"},	{EngineIO::Key::NP_DECIMAL, ".", "."},
 
-			{olc::Key::PERIOD, ".", ">"}, {olc::Key::EQUALS, "=", "+"}, {olc::Key::COMMA, ",", "<"}, {olc::Key::MINUS, "-", "_"}, {olc::Key::SPACE, " ", " "},
+			{EngineIO::Key::PERIOD, ".", ">"}, {EngineIO::Key::EQUALS, "=", "+"}, {EngineIO::Key::COMMA, ",", "<"}, {EngineIO::Key::MINUS, "-", "_"}, {EngineIO::Key::SPACE, " ", " "},
 
-			{olc::Key::OEM_1, ";", ":"}, {olc::Key::OEM_2, "/", "?"}, {olc::Key::OEM_3, "\'", "@"}, {olc::Key::OEM_4, "[", "{"},
-			{olc::Key::OEM_5, "\\", "|"}, {olc::Key::OEM_6, "]", "}"}, {olc::Key::OEM_7, "#", "~"},
+			{EngineIO::Key::OEM_1, ";", ":"}, {EngineIO::Key::OEM_2, "/", "?"}, {EngineIO::Key::OEM_3, "\'", "@"}, {EngineIO::Key::OEM_4, "[", "{"},
+			{EngineIO::Key::OEM_5, "\\", "|"}, {EngineIO::Key::OEM_6, "]", "}"}, {EngineIO::Key::OEM_7, "#", "~"},
 
-			// {olc::Key::TAB, "\t", "\t"}
+			// {EngineIO::Key::TAB, "\t", "\t"}
 		};
 	}
 
-	void PixelGameEngine::pgex_Register(olc::PGEX* pgex)
+	void PixelGameEngine::pgex_Register(EngineIO::PGEX* pgex)
 	{
 		if (std::find(vExtensions.begin(), vExtensions.end(), pgex) == vExtensions.end())
 			vExtensions.push_back(pgex);
@@ -1463,10 +1469,10 @@ namespace olc
 	// Need a couple of statics as these are singleton instances
 	// read from multiple locations
 	std::atomic<bool> PixelGameEngine::bAtomActive{ false };
-	olc::PixelGameEngine* olc::PGEX::pge = nullptr;
-	olc::PixelGameEngine* olc::Platform::ptrPGE = nullptr;
-	olc::PixelGameEngine* olc::Renderer::ptrPGE = nullptr;
-	std::unique_ptr<ImageLoader> olc::Sprite::loader = nullptr;
+	EngineIO::PixelGameEngine* EngineIO::PGEX::pge = nullptr;
+	EngineIO::PixelGameEngine* EngineIO::Platform::ptrPGE = nullptr;
+	EngineIO::PixelGameEngine* EngineIO::Renderer::ptrPGE = nullptr;
+	std::unique_ptr<ImageLoader> EngineIO::Sprite::loader = nullptr;
 };
 #pragma endregion engine
 
@@ -1498,17 +1504,17 @@ typedef HDC glDeviceContext_t;
 typedef HGLRC glRenderContext_t;
 
 
-namespace olc
+namespace EngineIO
 {
-	class Renderer_OGL10 : public olc::Renderer
+	class Renderer_OGL10 : public EngineIO::Renderer
 	{
 	private:
 		glDeviceContext_t glDeviceContext = 0;
 		glRenderContext_t glRenderContext = 0;
 
 		bool bSync = false;
-		olc::DecalMode nDecalMode = olc::DecalMode(-1); // Thanks Gusgo & Bispoo
-		olc::DecalStructure nDecalStructure = olc::DecalStructure(-1);
+		EngineIO::DecalMode nDecalMode = EngineIO::DecalMode(-1); // Thanks Gusgo & Bispoo
+		EngineIO::DecalStructure nDecalStructure = EngineIO::DecalStructure(-1);
 
 	public:
 		void PrepareDevice() override
@@ -1516,7 +1522,7 @@ namespace olc
 
 		}
 
-		olc::rcode CreateDevice(std::vector<void*> params, bool bFullScreen, bool bVSYNC) override
+		EngineIO::rcode CreateDevice(std::vector<void*> params, bool bFullScreen, bool bVSYNC) override
 		{
 			// Create Device Context
 			glDeviceContext = GetDC((HWND)(params[0]));
@@ -1529,10 +1535,10 @@ namespace olc
 			};
 
 			int pf = 0;
-			if (!(pf = ChoosePixelFormat(glDeviceContext, &pfd))) return olc::FAIL;
+			if (!(pf = ChoosePixelFormat(glDeviceContext, &pfd))) return EngineIO::FAIL;
 			SetPixelFormat(glDeviceContext, pf, &pfd);
 
-			if (!(glRenderContext = wglCreateContext(glDeviceContext))) return olc::FAIL;
+			if (!(glRenderContext = wglCreateContext(glDeviceContext))) return EngineIO::FAIL;
 			wglMakeCurrent(glDeviceContext, glRenderContext);
 
 			// Remove Frame cap
@@ -1543,14 +1549,14 @@ namespace olc
 			glEnable(GL_TEXTURE_2D); // Turn on texturing
 			glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
-			return olc::rcode::OK;
+			return EngineIO::rcode::OK;
 		}
 
-		olc::rcode DestroyDevice() override
+		EngineIO::rcode DestroyDevice() override
 		{
 			wglDeleteContext(glRenderContext);
 
-			return olc::rcode::OK;
+			return EngineIO::rcode::OK;
 		}
 
 		void DisplayFrame() override
@@ -1561,7 +1567,7 @@ namespace olc
 
 		void PrepareDrawing() override
 		{
-			//ClearBuffer(olc::GREEN, true);
+			//ClearBuffer(EngineIO::GREEN, true);
 			glEnable(GL_BLEND);
 			nDecalMode = DecalMode::NORMAL;
 			nDecalStructure = DecalStructure::FAN;
@@ -1621,13 +1627,13 @@ namespace olc
 			return id;
 		}
 
-		void UpdateTexture(uint32_t id, olc::Sprite* spr) override
+		void UpdateTexture(uint32_t id, EngineIO::Sprite* spr) override
 		{
 			UNUSED(id);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, spr->width, spr->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, spr->GetData());
 		}
 
-		void ReadTexture(uint32_t id, olc::Sprite* spr) override
+		void ReadTexture(uint32_t id, EngineIO::Sprite* spr) override
 		{
 			glReadPixels(0, 0, spr->width, spr->height, GL_RGBA, GL_UNSIGNED_BYTE, spr->GetData());
 		}
@@ -1637,14 +1643,14 @@ namespace olc
 			glBindTexture(GL_TEXTURE_2D, id);
 		}
 
-		void ClearBuffer(olc::Pixel p, bool bDepth) override
+		void ClearBuffer(EngineIO::Pixel p, bool bDepth) override
 		{
 			glClearColor(float(p.r) / 255.0f, float(p.g) / 255.0f, float(p.b) / 255.0f, float(p.a) / 255.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
 			if (bDepth) glClear(GL_DEPTH_BUFFER_BIT);
 		}
 
-		void UpdateViewport(const olc::vi2d& pos, const olc::vi2d& size) override
+		void UpdateViewport(const EngineIO::vi2d& pos, const EngineIO::vi2d& size) override
 		{
 			glViewport(pos.x, pos.y, size.x, size.y);
 		}
@@ -1671,9 +1677,9 @@ namespace olc
 #pragma comment(lib, "gdi32.lib")		// For other Windows Compilers please add
 #pragma comment(lib, "opengl32.lib")	// these libs to your linker input
 
-namespace olc
+namespace EngineIO
 {
-	class Platform_Windows : public olc::Platform
+	class Platform_Windows : public EngineIO::Platform
 	{
 	private:
 		HWND olc_hWnd = nullptr;
@@ -1690,29 +1696,29 @@ namespace olc
 		}
 
 	public:
-		virtual olc::rcode ApplicationStartUp() override { return olc::rcode::OK; }
-		virtual olc::rcode ApplicationCleanUp() override { return olc::rcode::OK; }
-		virtual olc::rcode ThreadStartUp() override { return olc::rcode::OK; }
+		virtual EngineIO::rcode ApplicationStartUp() override { return EngineIO::rcode::OK; }
+		virtual EngineIO::rcode ApplicationCleanUp() override { return EngineIO::rcode::OK; }
+		virtual EngineIO::rcode ThreadStartUp() override { return EngineIO::rcode::OK; }
 
-		virtual olc::rcode ThreadCleanUp() override
+		virtual EngineIO::rcode ThreadCleanUp() override
 		{
 			renderer->DestroyDevice();
 			PostMessage(olc_hWnd, WM_DESTROY, 0, 0);
-			return olc::OK;
+			return EngineIO::OK;
 		}
 
-		virtual olc::rcode CreateGraphics(bool bFullScreen, bool bEnableVSYNC, const olc::vi2d& vViewPos, const olc::vi2d& vViewSize) override
+		virtual EngineIO::rcode CreateGraphics(bool bFullScreen, bool bEnableVSYNC, const EngineIO::vi2d& vViewPos, const EngineIO::vi2d& vViewSize) override
 		{
-			if (renderer->CreateDevice({ olc_hWnd }, bFullScreen, bEnableVSYNC) == olc::rcode::OK)
+			if (renderer->CreateDevice({ olc_hWnd }, bFullScreen, bEnableVSYNC) == EngineIO::rcode::OK)
 			{
 				renderer->UpdateViewport(vViewPos, vViewSize);
-				return olc::rcode::OK;
+				return EngineIO::rcode::OK;
 			}
 			else
-				return olc::rcode::FAIL;
+				return EngineIO::rcode::FAIL;
 		}
 
-		virtual olc::rcode CreateWindowPane(const olc::vi2d& vWindowPos, olc::vi2d& vWindowSize, bool bFullScreen) override
+		virtual EngineIO::rcode CreateWindowPane(const EngineIO::vi2d& vWindowPos, EngineIO::vi2d& vWindowSize, bool bFullScreen) override
 		{
 			WNDCLASS wc;
 			wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
@@ -1731,7 +1737,7 @@ namespace olc
 			DWORD dwExStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
 			DWORD dwStyle = WS_CAPTION | WS_SYSMENU | WS_VISIBLE | WS_THICKFRAME;
 
-			olc::vi2d vTopLeft = vWindowPos;
+			EngineIO::vi2d vTopLeft = vWindowPos;
 
 			// Handle Fullscreen
 			if (bFullScreen)
@@ -1740,7 +1746,7 @@ namespace olc
 				dwStyle = WS_VISIBLE | WS_POPUP;
 				HMONITOR hmon = MonitorFromWindow(olc_hWnd, MONITOR_DEFAULTTONEAREST);
 				MONITORINFO mi = { sizeof(mi) };
-				if (!GetMonitorInfo(hmon, &mi)) return olc::rcode::FAIL;
+				if (!GetMonitorInfo(hmon, &mi)) return EngineIO::rcode::FAIL;
 				vWindowSize = { mi.rcMonitor.right, mi.rcMonitor.bottom };
 				vTopLeft.x = 0;
 				vTopLeft.y = 0;
@@ -1798,16 +1804,16 @@ namespace olc
 			mapKeys[VK_OEM_MINUS] = Key::MINUS;		// the minus key on any keyboard
 			mapKeys[VK_OEM_PERIOD] = Key::PERIOD;	// the period key on any keyboard
 			mapKeys[VK_CAPITAL] = Key::CAPS_LOCK;
-			return olc::OK;
+			return EngineIO::OK;
 		}
 
-		virtual olc::rcode SetWindowTitle(const std::string& s) override
+		virtual EngineIO::rcode SetWindowTitle(const std::string& s) override
 		{
 			SetWindowText(olc_hWnd, ConvertS2W(s).c_str());
-			return olc::OK;
+			return EngineIO::OK;
 		}
 
-		virtual olc::rcode StartSystemEventLoop() override
+		virtual EngineIO::rcode StartSystemEventLoop() override
 		{
 			MSG msg;
 			while (GetMessage(&msg, NULL, 0, 0) > 0)
@@ -1815,10 +1821,10 @@ namespace olc
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}
-			return olc::OK;
+			return EngineIO::OK;
 		}
 
-		virtual olc::rcode HandleSystemEvent() override { return olc::rcode::FAIL; }
+		virtual EngineIO::rcode HandleSystemEvent() override { return EngineIO::rcode::FAIL; }
 
 		// Windows Event Handler - this is statically connected to the windows event system
 		static LRESULT CALLBACK olc_WindowEvent(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -1865,12 +1871,12 @@ namespace olc
 // | Configuration						                                          |
 // O------------------------------------------------------------------------------O
 #pragma region pge_config
-namespace olc
+namespace EngineIO
 {
 	void PixelGameEngine::olc_ConfigureSystem()
 	{
-		platform = std::make_unique<olc::Platform_Windows>();
-		renderer = std::make_unique<olc::Renderer_OGL10>();
+		platform = std::make_unique<EngineIO::Platform_Windows>();
+		renderer = std::make_unique<EngineIO::Renderer_OGL10>();
 		// Associate components with PGE instance
 		platform->ptrPGE = this;
 		renderer->ptrPGE = this;
