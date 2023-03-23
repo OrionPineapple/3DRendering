@@ -88,7 +88,9 @@ public:
 
         if (!FileInput)
         {
+            FileInput.close();
             throw EngineException(MeshLoadError, "Could not locate file: " + ObjFileName);
+            return;
         }
 
 		while (FileInput) {

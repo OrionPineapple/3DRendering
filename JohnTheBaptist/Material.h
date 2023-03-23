@@ -12,9 +12,6 @@
 class Material
 {
 private:
-    static const std::string MaterialLoadFail = "Could not load Material";
-
-private:
     ColourRGB AmbientColour;
     ColourRGB DiffuseColour;
     ColourRGB SpecularColour;
@@ -43,7 +40,8 @@ public:
 
         if (!FileInput)
         {
-            throw EngineException(MaterialLoadFail, "Could not locate file: " + FileName);
+            FileInput.close();
+            throw EngineException("Could not load Material", "Could not locate file: " + FileName);
             return;
         }
 
