@@ -300,6 +300,7 @@ private:
 				float beta = ((float)x - (float)start_x) / ((float)end_x - (float)start_x);
 				float z = Interpolate(start_z, end_z, beta);
 
+                if (x < 0 || y < 0 || x >= Camera->GetScreenWidth() || y >= Camera->GetScreenHeight()) { continue; }
 				if (GetDepthBufferAt(x, y) > z)
 				{
 					Vector3D Normal = Vector3D::Normalise(Vector3D::Interpolate(start_n, end_n, beta));
@@ -341,7 +342,8 @@ private:
 			{
 				float beta = ((float)x - (float)start_x) / ((float)end_x - (float)start_x);
 				float z = Interpolate(start_z, end_z, beta);
-				
+
+                if (x < 0 || y < 0 || x >= Camera->GetScreenWidth() || y >= Camera->GetScreenHeight()) { continue; }
 				if (GetDepthBufferAt(x, y) > z)
 				{
 					SetDepthBufferAt(x, y, z);
