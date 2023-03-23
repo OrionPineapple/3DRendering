@@ -15,6 +15,11 @@ const int DefaultWidth = 400;
 class Engine 
 {
 private:
+    const std::string PixelReadError = "Cannot get pixel out of bounds of the screen";
+    const std::string PixelWriteError = "Cannot draw out of bounds of the screen";
+    const std::string DepthReadError = "Cannot get depth out of the bounds of the screen";
+
+private:
     //Render Stuff
 	EngineIO::PixelGameEngine EngineController;
 	float RunTime;
@@ -67,7 +72,7 @@ public:
     {
         if (x < 0 || y < 0 || x >= Camera->GetScreenWidth() || y >= Camera->GetScreenHeight())
         {
-            throw EngineException("Cannot draw out of bounds of the screen", "The coordinates: (" + std::to_string(x) + ", " + std::to_string(y) + ") are invalid)");
+            throw EngineException(PixelWriteError, "The coordinates: (" + std::to_string(x) + ", " + std::to_string(y) + ") are invalid)");
             return;
         }
         EngineController.Draw(x, y, EngineIO::PixelF((float)Colour.GetRed() / (float)255, (float)Colour.GetGreen() / (float)255, (float)Colour.GetBlue() / (float)255));
@@ -77,7 +82,7 @@ public:
     {
         if (x < 0 || y < 0 || x >= Camera->GetScreenWidth() || y >= Camera->GetScreenHeight()) 
         { 
-            throw EngineException("Cannot get pixel out of bounds of the screen", "The coordinates: (" + std::to_string(x) + ", " + std::to_string(y) + ") are invalid)"); 
+            throw EngineException(PixelWriteError, "The coordinates: (" + std::to_string(x) + ", " + std::to_string(y) + ") are invalid)"); 
             return ColourRGB(); 
         }
 
@@ -848,10 +853,11 @@ public:
 public:
 	float GetDepthBufferAt(int x, int y)
 	{
-		if (x < 0) { return -1.0f; }
-		if (y < 0) { return -1.0f; }
-		if (x >= Camera->GetScreenWidth()) { return -1.0f; }
-		if (y >= Camera->GetScreenHeight()) { return -1.0f; }
+        if (x < 0 || y < 0 || x >= Camera->GetScreenWidth() || y >= Camera->GetScreenHeight())
+        {
+            throw EngineException(DepthReadError, "The coordinates: (" + std::to_string(x) + ", " + std::to_string(y) + ") are invalid)");
+            return -1.0f;
+        }
 		return DepthBuffer[x + (Camera->GetScreenWidth() * y)];
 	}
 

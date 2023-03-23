@@ -12,6 +12,9 @@
 class Material
 {
 private:
+    static const std::string MaterialLoadFail = "Could not load Material";
+
+private:
     ColourRGB AmbientColour;
     ColourRGB DiffuseColour;
     ColourRGB SpecularColour;
@@ -37,6 +40,12 @@ public:
 
         std::string CurrentKey = "";
         Material CurrentMaterial;
+
+        if (!FileInput)
+        {
+            throw EngineException(MaterialLoadFail, "Could not locate file: " + FileName);
+            return;
+        }
 
         while (FileInput) {
             std::getline(FileInput, line);

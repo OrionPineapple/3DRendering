@@ -13,9 +13,13 @@ extern "C"
 class Texture 
 {
 private:
+    const std::string TextureLoadFail = "Failed to load texture file";
+
+private:
     int Height;
     int Width;
 	std::vector<ColourRGB> Data;
+
 
 public:
     Texture()
@@ -40,7 +44,7 @@ public:
 
         if (!success)
         {
-            throw EngineException("Failed to load texture file", "There was an error in loading " + FileName + ". When using an .exe you must have it within the directory specified. If using visual studio ensure it is in the same folder as all the headers too");
+            throw EngineException(TextureLoadFail, "There was an error in loading " + FileName + ". When using an .exe you must have it within the directory specified. If using visual studio ensure it is in the same folder as all the headers too");
             return;
         }
 

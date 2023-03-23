@@ -171,6 +171,10 @@ namespace InstanceHeirachy
 
     class Instance
     {
+    private:
+        const std::string LockedInstance = "Cannot set InstanceID to a locked Instance";
+        const std::string InvalidParent = "Attempt to set an invalid parent instance";
+
     protected:
         std::string Name;
         int ParentID = -1;
@@ -191,7 +195,7 @@ namespace InstanceHeirachy
             int ID = WorldRef->RegisterInstance(this);
             if (Locked)
             {
-                throw EngineException("Cannot set InstanceID to a locked Instance", "Attempt to change InstanceID of " + Name + ". The InstanceID is locked!");
+                throw EngineException(LockedInstance, "Attempt to change InstanceID of " + Name + ". The InstanceID is locked!");
                 return;
             }
 
@@ -241,22 +245,22 @@ namespace InstanceHeirachy
         {
             if (NewParent == NULL)
             {
-                throw EngineException("Cannot set Parent to a NULL Instance", "Attempt to set parent of " + Name + " but that instance does not exist");
+                throw EngineException(InvalidParent, "Attempt to set parent of " + Name + " but that instance does not exist");
                 return false;
             }
             if (!NewParent->CanHaveChildren)
             {
-                throw EngineException("Cannot set Parent to an Instance that cannot have children", "Attempt to set parent of " + Name + " as " + NewParent->GetName());
+                throw EngineException(InvalidParent, "Attempt to set parent of " + Name + " as " + NewParent->GetName());
                 return false;
             }
             if (NewParent->IsDescendantOf(InstanceID))
             {
-                throw EngineException("Cannot set a descendant of an Instance as its Parent", "Attemp to set parent of " + Name + " as it's descendant " + NewParent->GetName());
+                throw EngineException(InvalidParent, "Attemp to set parent of " + Name + " as it's descendant " + NewParent->GetName());
                 return false;
             }
             if (NewParent->GetInstanceID() == InstanceID)
             {
-                throw EngineException("Cannot set a Instances Parent as itself", "Attempt to set parent of " + Name + " as itself");
+                throw EngineException(InvalidParent, "Attempt to set parent of " + Name + " as itself");
                 return false;
             }
 

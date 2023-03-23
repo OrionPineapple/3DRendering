@@ -16,6 +16,9 @@
 
 class Mesh
 {
+private:
+    const std::string MeshLoadError = "Could not load mesh";
+
 protected:
 	std::vector<std::shared_ptr<Point>> PointArray;
 	std::vector< std::shared_ptr<Triangle>> TriangleArray;
@@ -82,6 +85,11 @@ public:
 		std::vector<Vector3D> NormalData;
         std::map<std::string, Material> MaterialData;
         Material CurrentMatt;
+
+        if (!FileInput)
+        {
+            throw EngineException(MeshLoadError, "Could not locate file: " + ObjFileName);
+        }
 
 		while (FileInput) {
 			std::getline(FileInput, line);
