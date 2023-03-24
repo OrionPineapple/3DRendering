@@ -130,14 +130,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="DynamicDestruction.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Matrix4x4Test.cpp" />
-    <ClCompile Include="SpinningLightTest.cpp" />
-    <ClCompile Include="TreeLightTest.cpp" />
-    <ClCompile Include="Vector2DTest.cpp" />
-    <ClCompile Include="Vector3DTest.cpp" />
-    <ClCompile Include="WaveTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />

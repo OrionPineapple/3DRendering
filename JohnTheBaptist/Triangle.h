@@ -54,6 +54,7 @@ public:
 public:
 	static void Project(const Triangle Pre, Matrix4x4 Projection, Vector3D &A, Vector3D &B, Vector3D &C)
 	{
+        //Project each of the triangles points to A, B, C
 		A = Matrix4x4::ProjectPoint(Pre.A->GetPosition(), Projection);
 		B = Matrix4x4::ProjectPoint(Pre.B->GetPosition(), Projection);
 		C = Matrix4x4::ProjectPoint(Pre.C->GetPosition(), Projection);
@@ -169,6 +170,7 @@ public:
 
 	Vector3D GetNormal()
 	{
+        //Use Cross product to determine normal
 		Vector3D Normal = Vector3D::Normalise(Vector3D::Cross(B->GetPosition() - A->GetPosition(), C->GetPosition() - A->GetPosition()));
 		Normal.SetW(0.0f);
 		return Normal;

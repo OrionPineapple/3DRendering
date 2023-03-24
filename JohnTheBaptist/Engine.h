@@ -45,6 +45,7 @@ public:
 	{
 		EngineController.sAppName = Name;
 
+        //connect up our events to the IO that controls the window
 		EngineController.OnUserCreate = std::bind(&Engine::OnEngineCreate, this);
 		EngineController.OnUserUpdate = std::bind(&Engine::OnUpdate, this, std::placeholders::_1);
 		EngineController.OnUserDestroy = std::bind(&Engine::OnEngineDestroy, this);
@@ -70,6 +71,7 @@ private:
 public:
     void Draw(int x, int y, ColourRGB Colour)
     {
+        //check its within the bounds of the screen
         if (x < 0 || y < 0 || x >= Camera->GetScreenWidth() || y >= Camera->GetScreenHeight())
         {
             throw EngineException(PixelWriteError, "The coordinates: (" + std::to_string(x) + ", " + std::to_string(y) + ") are invalid)");
@@ -80,6 +82,7 @@ public:
 
     ColourRGB GetPixel(int x, int y)
     {
+        //check its within the bounds of the screen
         if (x < 0 || y < 0 || x >= Camera->GetScreenWidth() || y >= Camera->GetScreenHeight()) 
         { 
             throw EngineException(PixelWriteError, "The coordinates: (" + std::to_string(x) + ", " + std::to_string(y) + ") are invalid)"); 
@@ -98,9 +101,12 @@ private:
 
 	void FillTriangle(Triangle& ProjectedTriangle, Vector3D A, Vector3D B, Vector3D C, Vector3D& CameraPosition, ColourRGB& Ambient, std::vector<InstanceHeirachy::PointLight*>& PointLights, std::vector<InstanceHeirachy::DirectionalLight*>& DirectionalLights, Vector3D& Position, Vector3D& Normal)
 	{
+        //We must fill this triangle onto the screen
+
 		float width = (float)Camera->GetScreenWidth();
 		float height = (float)Camera->GetScreenHeight();
 
+        //tranform to screen space
 		int x_a, x_b, x_c, y_a, y_b, y_c;
 		float z_a, z_b, z_c;
 		x_a = (A.GetX() + 1.0f) * 0.5f * width;
@@ -136,8 +142,13 @@ private:
 			std::swap(z_a, z_b);
 		}
 
+        //first we sorted the points into height order
+        //this is so that we can iterate through its pixels easily
+
 		if (y_a == y_b)
 		{
+            //if two ys are equal, that means this is a flat
+            //which is far easier to draw from
 			FillTriangleFromFlat(
 				x_a, y_a, z_a, 
 				x_b, y_b, z_b, 
@@ -146,6 +157,8 @@ private:
 		}
 		else if (y_b == y_c)
 		{
+            //if two ys are equal, that means this is a flat
+            //which is far easier to draw from
 			FillTriangleFromFlat(
 				x_c, y_c, z_c,
 				x_b, y_b, z_b,
@@ -161,6 +174,11 @@ private:
 			int x_k = Interpolate(x_a, x_c, alpha);
 			float z_k = Interpolate(z_a, z_c, alpha);
 
+            //this triangle does not have a flat base
+            //so we split it into halfs that do
+            //we must interpolate values for the point k
+            //which makes a flat line with b
+
 			FillTriangleFromFlat(
 				x_k, y_k, z_k,
 				x_b, y_b, z_b,
@@ -173,14 +191,13 @@ private:
                 ProjectedTriangle, CameraPosition, Ambient, PointLights, DirectionalLights, Position, Normal);
 			//b,k is inline
 		}
-
-        //PlacePoint(x_a, y_a, 1.0f);
-        //PlacePoint(x_b, y_b, 1.0f);
-        //PlacePoint(x_c, y_c, 1.0f);
 	}
 
 	void FillTriangleWithNormals(Triangle& ProjectedTriangle, Vector3D& A, Vector3D& B, Vector3D& C, Vector3D& CameraPosition, ColourRGB& Ambient, std::vector<InstanceHeirachy::PointLight*>& PointLights, std::vector<InstanceHeirachy::DirectionalLight*>& DirectionalLights, Vector3D& Position)
 	{
+        //Normals add another layer of confusion
+        //Check FillTriangle() first
+
 		Vector3D NA = ProjectedTriangle.GetVertexNormalA();
 		Vector3D NB = ProjectedTriangle.GetVertexNormalB();
 		Vector3D NC = ProjectedTriangle.GetVertexNormalC();
@@ -188,6 +205,7 @@ private:
 		float width = (float)Camera->GetScreenWidth();
 		float height = (float)Camera->GetScreenHeight();
 
+        //tranform to screen space
 		int x_a, x_b, x_c, y_a, y_b, y_c;
 		float z_a, z_b, z_c;
 		x_a = (A.GetX() + 1.0f) * 0.5f * width;
@@ -228,6 +246,8 @@ private:
 
 		if (y_a == y_b)
 		{
+            //if two ys are equal, that means this is a flat
+            //which is far easier to draw from
 			FillTriangleFromFlatWithNormals(
 				x_a, y_a, z_a, NA,
 				x_b, y_b, z_b, NB,
@@ -236,6 +256,8 @@ private:
 		}
 		else if (y_b == y_c)
 		{
+            //if two ys are equal, that means this is a flat
+            //which is far easier to draw from
 			FillTriangleFromFlatWithNormals(
 				x_c, y_c, z_c, NC,
 				x_b, y_b, z_b, NB,
@@ -244,7 +266,11 @@ private:
 		}
 		else
 		{
-			//split triangle at height y_b
+            //this triangle does not have a flat base
+            //so we split it into halfs that do
+            //we must interpolate values for the point k
+            //which makes a flat line with b
+
 			int y_k = y_b;
 			float alpha = ((float)y_b - (float)y_a) / ((float)y_c - (float)y_a);
 
@@ -269,6 +295,9 @@ private:
 
 	void FillTriangleFromFlatWithNormals(int& x_a, int& y_a, float& z_a, Vector3D& NA, int& x_b, int& y_b, float& z_b, Vector3D& NB, int& x_c, int& y_c, float& z_c, Vector3D& NC, Triangle& Tri, Vector3D& CameraPosition, ColourRGB& Ambient, std::vector<InstanceHeirachy::PointLight*>& PointLights, std::vector<InstanceHeirachy::DirectionalLight*>& DirectionalLights, Vector3D& Position)
 	{
+        //normals add another layer of confusion
+        //start with the method FillTriangleFromFlat
+
         Material Matt = Tri.GetMaterial();
 		//y_a == y_b
 		int direction_y = 1;
@@ -278,6 +307,11 @@ private:
 		}
 		for (int y = y_a; y != y_c; y += direction_y)
 		{
+            //for each line across the triangle
+            //we define our start and end points
+            //then we get our values such as depth and normal
+            //these too must be interpolated to get our start and end values
+
 			float alpha = ((float)y - (float)y_a) / ((float)y_c - (float)y_a);
 
 			int start_x = Interpolate(x_a, x_c, alpha);
@@ -297,16 +331,22 @@ private:
 
 			for (int x = start_x; x != end_x + direction_x; x += direction_x)
 			{
+                //for each x in this flat line
+                //we get our depth and normal
 				float beta = ((float)x - (float)start_x) / ((float)end_x - (float)start_x);
 				float z = Interpolate(start_z, end_z, beta);
 
                 if (x < 0 || y < 0 || x >= Camera->GetScreenWidth() || y >= Camera->GetScreenHeight()) { continue; }
+                //check that the depth at this point is greater than our current depth
+                //if it was lower then it means there is something infront of this triangle
+                //and that we shouldnt draw
 				if (GetDepthBufferAt(x, y) > z)
 				{
 					Vector3D Normal = Vector3D::Normalise(Vector3D::Interpolate(start_n, end_n, beta));
 
 					SetDepthBufferAt(x, y, z);
                     Draw(x, y, ShadePoint(Position, Normal, Matt, CameraPosition, Ambient, PointLights, DirectionalLights));
+                    //shade in out point using normals and values
 				}
 			}
 		}
@@ -324,6 +364,10 @@ private:
 
 		for (int y = y_a; y != y_c; y += direction_y)
 		{
+            //for each line across the triangle
+            //we define our start and end points
+            //then we get our values such as depth and normal
+            //these too must be interpolated to get our start and end values
 			float alpha = ((float)y - (float)y_a) / ((float)y_c - (float)y_a);
 
 			int start_x = Interpolate(x_a, x_c, alpha);
@@ -340,14 +384,22 @@ private:
 			
 			for (int x = start_x; x != end_x + direction_x; x += direction_x)
 			{
+                //for each x in this flat line
+                //we get our depth
 				float beta = ((float)x - (float)start_x) / ((float)end_x - (float)start_x);
 				float z = Interpolate(start_z, end_z, beta);
 
                 if (x < 0 || y < 0 || x >= Camera->GetScreenWidth() || y >= Camera->GetScreenHeight()) { continue; }
+
+                //check that the depth at this point is greater than our current depth
+                //if it was lower then it means there is something infront of this triangle
+                //and that we shouldnt draw 
+
 				if (GetDepthBufferAt(x, y) > z)
 				{
 					SetDepthBufferAt(x, y, z);
 					Draw(x, y, ShadePoint(Position, Normal, Matt, CameraPosition, Ambient, PointLights, DirectionalLights));
+                    //shade in out point using normals and values
 				}
 			}
 		}
@@ -355,9 +407,12 @@ private:
 
     ColourRGB ShadePoint(Vector3D Position, Vector3D Normal, Material& Matt, Vector3D& CameraPos, ColourRGB& Ambient, std::vector<InstanceHeirachy::PointLight*>& PointLights, std::vector<InstanceHeirachy::DirectionalLight*>& DirectionalLights)
     {
+        //use phong reflection equation
+
         Vector3D ToCamera = Vector3D::Normalise(CameraPos - Position);
         Normal = Vector3D::Normalise(Normal);
         ColourRGB PixelAmbient = ColourRGB::Multiply(Ambient, Matt.GetAmbient());
+        //apply the normal to the point
 
         ColourRGB PixelDiffuse = ColourRGB(0, 0, 0);
         ColourRGB PixelSpecular = ColourRGB(0, 0, 0);
@@ -371,6 +426,7 @@ private:
             Vector3D ReflectedRay = Vector3D::Normalise((Normal * 2 * Dot) - ToLight);
             Dot = Vector3D::Dot(ReflectedRay, ToCamera);
             PixelSpecular = ColourRGB::GetMaxinum(PixelSpecular, ColourRGB::Multiply(Matt.GetSpecular(), PointLight->GetLightColour() * Dot));
+            //for each pointlight, apply the specular and diffuse equations
         }
 
         for (InstanceHeirachy::DirectionalLight* DirectionalLight : DirectionalLights)
@@ -382,14 +438,15 @@ private:
             Vector3D ReflectedRay = Vector3D::Normalise((Normal * 2 * Dot) - ToLight);
             Dot = Vector3D::Dot(ReflectedRay, ToCamera);
             PixelSpecular = ColourRGB::GetMaxinum(PixelSpecular, ColourRGB::Multiply(Matt.GetSpecular(), DirectionalLight->GetLightColour() * Dot));
+            //for each directional light, apply the specular and diffuse equations
         }
 
         return ColourRGB::GetMaxinum(PixelAmbient, ColourRGB::GetMaxinum(PixelSpecular, PixelDiffuse));
-        //return Matt.GetDiffuse();
     }
 
 	void ProjectAndDraw(Triangle& Tri, Matrix4x4& Projection, Matrix4x4& InverseRotate, Vector3D& Normal, Vector3D& CameraPosition, ColourRGB& Ambient, std::vector<InstanceHeirachy::PointLight*>& PointLights, std::vector<InstanceHeirachy::DirectionalLight*>& DirectionalLights, Vector3D& Position)
 	{
+        //project our triangle into 2D space
 		Vector3D A, B, C;
 		Triangle::Project(Tri, Projection, A, B, C);
 
@@ -405,6 +462,7 @@ private:
 
 	int HowManyPointsBehindPlane(InstanceHeirachy::Plane& CullingPlane, Triangle& Tri) 
 	{
+        //counts how much of a triangle is in or out of a plane
         int Count = 0;
 		if (Vector3D::Dot(
 			Tri.GetPointA()->GetPosition() - CullingPlane.Position,
@@ -442,6 +500,10 @@ private:
 
     void ClipTriangle1Point(std::vector<Triangle>& Triangles, InstanceHeirachy::Plane& Plane, Triangle& Tri)
     {
+        //if a triangle has one point above a plane
+        //we find the two intersection points
+        //and append a culled triangle to the render list
+
         Point A = *Tri.GetPointA();
         Point B = *Tri.GetPointB();
         Point C = *Tri.GetPointC();
@@ -514,6 +576,10 @@ private:
 
     void ClipTriangle2Point(std::vector<Triangle>& Triangles, InstanceHeirachy::Plane& Plane, Triangle& Tri)
     {
+        //we have two points above our plane
+        //and two intersection points
+        //we must therfore append two triangles
+
         Point A = *Tri.GetPointA();
         Point B = *Tri.GetPointB();
         Point C = *Tri.GetPointC();
@@ -611,6 +677,7 @@ private:
 
     std::vector<Triangle> CullTriangles(std::vector<Triangle>& Triangles, InstanceHeirachy::Plane& CullingPlane)
     {
+        //if a triangle isnt completely within the plane, cut off its points until it is
         std::vector<Triangle> NewTriangles;
         for (int i = 0; i < Triangles.size(); i++)
         {
@@ -636,6 +703,12 @@ private:
 
     void RenderSubWorld(std::vector<InstanceHeirachy::SubWorldStackFrame>& Stack, Matrix4x4& Projection, Matrix4x4& InverseCameraRotation, Matrix4x4& InverseCameraTranslation, Vector3D& CameraPos, ColourRGB& Ambient, std::vector<InstanceHeirachy::PointLight*>& PointLights, std::vector<InstanceHeirachy::DirectionalLight*>& DirectionalLights)
     {
+        //We must get the ultimate transform matrix
+        //from all of the ascending subworlds
+        //then get all of the applicable lights (only lights from ascendants)
+        //and render each of the mesh instances within
+
+
         InstanceHeirachy::SubWorldStackFrame Frame = Stack.at(Stack.size() - 1);
 
         Matrix4x4 SubWorldOffset;
@@ -647,6 +720,7 @@ private:
 
         for (InstanceHeirachy::MeshInstance* MeshToRender : Frame.Meshes)
         {
+            //get the matrix data for our mesh
             Matrix4x4 Transform = MeshToRender->GetMatrix() * SubWorldOffset;
             Matrix4x4 InverseTransform = Transform.Inverse();
 
@@ -656,17 +730,20 @@ private:
             Matrix4x4 Rotate = Transform.ExtractRotationMatrix();
             Matrix4x4 InverseRotate = Rotate.Inverse();
 
-
+            //prepare a projection matrix
             Matrix4x4 FinalProjection = Projection * InverseCameraRotation * InverseCameraTranslation * Transform;
             std::vector<InstanceHeirachy::Plane> CullingPlanes = Camera->GetCullingPlanes(InverseTransform, InverseRotate);
 
+            //Get our mesh data
             std::shared_ptr<Mesh> MeshRef = MeshToRender->GetReferenceToMesh();
             std::vector<std::shared_ptr<Triangle>> TriangleArray = *(MeshRef->GetTriangleReferences());
 
+            //for all the triangles
             for (int i = 0; i < TriangleArray.size(); i++)
             {
                 std::shared_ptr<Triangle> Tri = TriangleArray[i];
 
+                //check it is visible to the camera
                 Vector3D Centre = Transform * Tri->GetCentre();
                 Vector3D ToCamera = CameraPos - Centre;
                 Vector3D Normal = Rotate * Tri->GetNormal();
@@ -679,11 +756,13 @@ private:
 
                 for (InstanceHeirachy::Plane CullingPlane : CullingPlanes)
                 {
+                    //cull the triangle so that only visible sections are drawn
                     TrianglesToRender = CullTriangles(TrianglesToRender, CullingPlane);
                 }
 
                 for (Triangle RenderableTri : TrianglesToRender)
                 {
+                    //render the triangle using the correct material
                     RenderableTri.SetMaterial(Tri->GetMaterial());
                     Vector3D Pos = Transform * Centre;
                     Vector3D Nor = Transform.ExtractRotationMatrix() * Normal;
@@ -696,6 +775,10 @@ private:
 
     void GatherLightData(std::vector<InstanceHeirachy::SubWorldStackFrame> Stack, ColourRGB& Ambient, std::vector<InstanceHeirachy::PointLight*>& PointLights, std::vector<InstanceHeirachy::DirectionalLight*>& DirectionalLights)
     {
+        //seperate the lights of ambient, point and direction
+        //into the applicable vector or light
+        //by going through each ascending SubWorld
+
         Ambient = ColourRGB(0, 0, 0);
         for (InstanceHeirachy::SubWorldStackFrame Frame : Stack)
         {
@@ -709,6 +792,8 @@ private:
                 switch (Light->GetType())
                 {
                 case InstanceHeirachy::InstanceType::AmbientLightType:
+                    //ambient only needs to get the maxinum channel
+                    //as it has no position or direction
                     AmbientLight = dynamic_cast<InstanceHeirachy::AmbientLight*>(Light);
                     Ambient = ColourRGB::GetMaxinum(Ambient, AmbientLight->GetLightColour());
                     break;
@@ -750,6 +835,8 @@ private:
         Matrix4x4 InverseCameraRotation = CameraRotationMatrix.Inverse();
         Matrix4x4 Projection = Matrix4x4::CreateProjectionMatrix(Camera->GetAspectRatio(), Camera->GetVerticalFoV(), Camera->GetMininumDepth(), Camera->GetMaxinumDepth());
 
+        //Apply a PRE-ORDER tree traversal
+        //Each subworld is a node
         while (Stack.size() > 0)
         {
             Frame = Stack.at(Stack.size() - 1);
@@ -764,6 +851,9 @@ private:
             
             if (Frame.SubWorldIndex >= Frame.SubWorlds.size())
             {
+                //searched all nodes
+                //backtrack until all other nodes have been search 
+                //if the world root has all nodes searched then the render is done
                 while (Frame.SubWorldIndex >= Frame.SubWorlds.size() && Stack.size() > 0)
                 {
                     Frame = Stack.at(Stack.size() - 1);
@@ -772,15 +862,16 @@ private:
             }
             else
             {
+                //iterate to the next subworld
                 Stack.push_back(Frame.SubWorlds[Frame.SubWorldIndex]->GetSubWorldStackFrame());
                 Frame.SubWorldIndex++;
-                //push frame[index]
-                //increment index
             }
         }
 
+        //Apply users 2D or post processing effects
         bool Result = PostFrame(DeltaTime);
         PreviousMouseCoordinates = GetMouseCoordinates();
+
         return Result;
 	}
 

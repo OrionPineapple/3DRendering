@@ -1,164 +1,161 @@
-//#include "Engine.h"
 //
-//class UserProgram : public Engine
+//#include <string>
+//#include <iostream>
+//#include "Vector3D.h"
+//
+//void Test1()
 //{
-//private:
-//    int Width = 500;
-//    int Length = 500;
-//    float Seperation = 0.1f;
-//    InstanceHeirachy::MeshInstance* MeshInstance;
+//    //Basic Setting and Getting
+//    std::cout << "Setting And Getting: ";
 //
-//public:
-//    UserProgram()
+//    Vector3D Vec = Vector3D(5.0f, 6.0f, 0.2f);
+//
+//    if (Vec.GetX() == 5.0f && Vec.GetY() == 6.0f && Vec.GetZ() == 0.2f)
 //    {
-//
-//    }
-//
-//private:
-//    void PreFrame(float DeltaTime) override
-//    {
-//        InstanceHeirachy::Camera* Camera = GetCamera();
-//
-//        if (IsKeyDown(EngineIO::Key::UP))
-//        {
-//            Camera->RotateX(DeltaTime);
-//        }
-//        if (IsKeyDown(EngineIO::Key::DOWN))
-//        {
-//            Camera->RotateX(-DeltaTime);
-//        }
-//        if (IsKeyDown(EngineIO::Key::LEFT))
-//        {
-//            Camera->SetMatrix(Camera->ExtractTranslationMatrix() * Matrix4x4::GetYRotationMatrix(-DeltaTime) * Camera->ExtractRotationMatrix());
-//        }
-//        if (IsKeyDown(EngineIO::Key::RIGHT))
-//        {
-//            Camera->SetMatrix(Camera->ExtractTranslationMatrix() * Matrix4x4::GetYRotationMatrix(DeltaTime) * Camera->ExtractRotationMatrix());
-//        }
-//
-//        Camera->SetVerticalFoV(Camera->GetVerticalFoV() - 0.0001f * GetScrollWheelDelta());
-//
-//        Matrix4x4 CameraRotationMatrix = Camera->ExtractRotationMatrix();
-//        Matrix4x4 InverseCameraRotation = CameraRotationMatrix.Inverse();
-//
-//        if (IsKeyDown(EngineIO::Key::W))
-//        {
-//            Camera->Translate(CameraRotationMatrix * Vector3D(0, DeltaTime, 0));
-//        }
-//        if (IsKeyDown(EngineIO::Key::S))
-//        {
-//            Camera->Translate(CameraRotationMatrix * Vector3D(0, -DeltaTime, 0));
-//        }
-//        if (IsKeyDown(EngineIO::Key::A))
-//        {
-//            Camera->Translate(CameraRotationMatrix * Vector3D(DeltaTime, 0, 0));
-//        }
-//        if (IsKeyDown(EngineIO::Key::D))
-//        {
-//            Camera->Translate(CameraRotationMatrix * Vector3D(-DeltaTime, 0, 0));
-//        }
-//        if (IsKeyDown(EngineIO::Key::SHIFT))
-//        {
-//            Camera->Translate(CameraRotationMatrix * Vector3D(0, 0, -DeltaTime));
-//        }
-//        if (IsKeyDown(EngineIO::Key::CTRL))
-//        {
-//            Camera->Translate(CameraRotationMatrix * Vector3D(0, 0, DeltaTime));
-//        }
-//        
-//
-//        
-//        std::vector<std::shared_ptr<Point>>* VectorOfPoints = MeshInstance->GetReferenceToMesh().get()->GetPointReferences();
-//        for (int x = 0; x < Width; x++)
-//        {
-//            for(int y = 0; y < Height; y++)
-//            {
-//                float Displacement = sinf(x + y + t);
-//                Vector3D Position = Vector3D((float)x * Seperation, Displacement, (float)y * Seperation);
-//                VectorOfPoints->at(x + (y * Width)).get()->SetPosition(Position);
-//            }
-//        }
-//    }
-//
-//    bool PostFrame(float DeltaTime) override
-//    {
-//        //After 3D Rendering
-//
-//        return true;
-//    }
-//
-//    bool OnStart() override
-//    {
-//        //Preload assets using Engine API before rendering begins
-//
-//        InstanceHeirachy::World* World = GetWorld();
-//        InstanceHeirachy::Instance* WorldRoot = GetWorldRoot();
-//
-//        Mesh* PlanarMesh = new Mesh();
-//        std::vector<std::shared_ptr<Point>>* VectorOfPoints = PlanarMesh->GetPointReferences();
-//        std::vector<std::shared_ptr<Triangle>>* VectorOfTriangles = PlanarMesh->GetTriangleReferences();
-//
-//    
-//        for (int x = 0; x < Width; x++)
-//        {
-//            for(int y = 0; y < Height; y++)
-//            {
-//                Vector3D Position = Vector3D((float)x * Seperation, 0, (float)y * Seperation);
-//                VectorOfPoints->push_back(std::shared_ptr<Point>>(new Point(Position)));
-//            }
-//        }
-//
-//        for (int x = 0; x < Width - 1; x++)
-//        {
-//            for(int y = 0; y < Height - 1; y++)
-//            {
-//                std::shared_ptr<Point>> A = VectorOfPoints->at((x) + (y * Width));
-//                std::shared_ptr<Point>> B = VectorOfPoints->at((x+ 1) + (y * Width));
-//                std::shared_ptr<Point>> C = VectorOfPoints->at((x) + ((y+1) * Width));
-//                VectorOfTriangles->push_back(std::shared_ptr<Triangle>>(new Triangle(A, B, C)))
-//            }
-//        }
-//
-//        for (int x = 0; x < Width - 1; x++)
-//        {
-//            for(int y = 0; y < Height - 1; y++)
-//            {
-//                std::shared_ptr<Point>> A = VectorOfPoints->at((x+1) + (y * Width));
-//                std::shared_ptr<Point>> B = VectorOfPoints->at((x+ 1) + ((y+1) * Width));
-//                std::shared_ptr<Point>> C = VectorOfPoints->at((x) + ((y+1) * Width));
-//                VectorOfTriangles->push_back(std::shared_ptr<Triangle>>(new Triangle(A, B, C)))
-//            }
-//        }
-//
-//        MeshInstance = new InstanceHeirachy::MeshInstance
-//        (
-//            World,
-//            std::shared_ptr<Mesh>(PlanarMesh)
-//        );
-//        MeshInstance->SetParent(WorldRoot);
-//
-//        return true;
-//    }
-//
-//    bool OnDestroy() override
-//    {
-//        //When Application is closed -> please save any needed data
-//        return true;
-//    }
-//
-//};
-//
-//
-//int main()
-//{
-//    UserProgram Program;
-//    if (Program.Start("User Program", 800, 500))
-//    {
-//        //Program Successfully Started
+//        std::cout << "Success";
 //    }
 //    else
 //    {
-//        //Program Failed to Start
+//        std::cout << "Fail";
 //    }
+//
+//    std::cout << std::endl << std::endl;
+//}
+//
+//void Test2()
+//{
+//    //Negative Setting and Getting
+//    std::cout << "Setting and Getting 2: ";
+//
+//    Vector3D Vec = Vector3D(-5.7f, -0.3f, -150.05f);
+//
+//    if (Vec.GetX() == -5.7f && Vec.GetY() == -0.3f && Vec.GetZ() == -150.05f)
+//    {
+//        std::cout << "Success";
+//    }
+//    else
+//    {
+//        std::cout << "Fail";
+//    }
+//
+//    std::cout << std::endl << std::endl;
+//}
+//
+//void Test3()
+//{
+//    //Addition and Subraction
+//    std::cout << "Addition and Subtraction: ";
+//
+//    Vector3D Vec = Vector3D(4.0f, 5.0f, -14.0f);
+//    Vector3D Vec2 = Vector3D(6.0f, -5.0f, 50.0f);
+//
+//
+//    if (Vec + Vec2 == Vector3D(10.0f, 0.0f, 36.0f) && Vec2 - Vec == Vector3D(2.0f, -10.0f, 64.0f))
+//    {
+//        std::cout << "Success";
+//    }
+//    else
+//    {
+//        std::cout << "Fail";
+//    }
+//
+//    std::cout << std::endl << std::endl;
+//}
+//
+//void Test4()
+//{
+//    //Multiply and Divide
+//    std::cout << "Multiplication and Division: ";
+//
+//    Vector3D Vec = Vector3D(4.0f, 5.0f, -0.2f);
+//    Vector3D Vec2 = Vector3D(6.0f, -24.0f, 3.0f);
+//
+//
+//    if (Vec * 3.0f == Vector3D(12.0f, 15.0f, -0.6f) && Vec2 / 2.0f == Vector3D(3.0f, -12.0f, 1.5f))
+//    {
+//        std::cout << "Success";
+//    }
+//    else
+//    {
+//        std::cout << "Fail";
+//    }
+//
+//    std::cout << std::endl << std::endl;
+//}
+//
+//void Test5()
+//{
+//    //Dot Product
+//    std::cout << "Dot Product: ";
+//
+//    Vector3D Vec = Vector3D(4.0f, 5.0f, 0.2f);
+//    Vector3D Vec2 = Vector3D(6.0f, -24.0f, -5.0f);
+//
+//
+//    if (Vector3D::Dot(Vec, Vec2) == -97.0f && Vector3D::Dot(Vec, Vec2) == Vector3D::Dot(Vec2, Vec))
+//    {
+//        std::cout << "Success";
+//    }
+//    else
+//    {
+//        std::cout << "Fail";
+//    }
+//
+//    std::cout << std::endl << std::endl;
+//}
+//
+//void Test6()
+//{
+//    //Magnitude and Normalisation
+//    std::cout << "Magnitude and Normalisation: ";
+//
+//    Vector3D Vec = Vector3D(2.0f, 8.0f, 16.0f);
+//    Vector3D Vec2 = Vector3D(6.0f, -24.0f, 0.2f);
+//
+//
+//    if (Vec.GetMagnitude() == 18.0f && Vector3D::Normalise(Vec2).GetMagnitude() == 1.0f)
+//    {
+//        std::cout << "Success";
+//    }
+//    else
+//    {
+//        std::cout << "Fail";
+//    }
+//
+//    std::cout << std::endl << std::endl;
+//}
+//
+//void Test7()
+//{
+//    //Interpolation
+//    std::cout << "Interpolation: ";
+//
+//    Vector3D Vec = Vector3D(4.0f, 8.0f, -3.0f);
+//    Vector3D Vec2 = Vector3D(6.0f, -24.0f, 7.0f);
+//
+//
+//    if (Vector3D::Interpolate(Vec, Vec2, 0.3f) == Vector3D::Interpolate(Vec2, Vec, 0.7f) && Vector3D::Interpolate(Vec, Vec2, 0.5f) == Vector3D(5.0f, -8.0f, 2.0f))
+//    {
+//        std::cout << "Success";
+//    }
+//    else
+//    {
+//        std::cout << "Fail";
+//    }
+//
+//    std::cout << std::endl << std::endl;
+//}
+//
+//int main()
+//{
+//    Test1();
+//    Test2();
+//    Test3();
+//    Test4();
+//    Test5();
+//    Test6();
+//    Test7();
 //    return 0;
 //}
+//
+//

@@ -12,6 +12,11 @@ namespace InstanceHeirachy
 
 	struct InstanceSearchParameter
 	{
+        //we may not wish to use all of the attributes
+        //so each attribute has a boolean
+        //to let us know whether we ignore
+        //or use that attribute
+
     private: 
         bool UseName = false;
 		std::string Name; 
@@ -243,6 +248,15 @@ namespace InstanceHeirachy
 
         bool SetParent(Instance* NewParent)
         {
+            //We dont want to create any loops in our World of Instances
+            //we only want a valid ROOTED tree
+            // so our new parent must:
+            // ->exist
+            // ->be able to have children instances
+            // ->not be a descendant of this instance
+            // ->not be itself
+            //
+
             if (NewParent == NULL)
             {
                 throw EngineException(InvalidParent, "Attempt to set parent of " + Name + " but that instance does not exist");
@@ -283,6 +297,7 @@ namespace InstanceHeirachy
 
         void Destroy()
         {
+            //must remove references to self
             if (ParentID != -1)
             {
                 Instance* ParentRef = GetParent();
@@ -295,6 +310,7 @@ namespace InstanceHeirachy
 
             for (Instance* Ref : GetChildren())
             {
+                //recursively destroy all children
                 Ref->Destroy();
             }
 

@@ -32,7 +32,7 @@ namespace InstanceHeirachy
 
         std::shared_ptr<Mesh> GetReferenceToMesh()
         {
-            return std::shared_ptr<Mesh>(MyMesh);
+            return MyMesh;
         }
 
     };

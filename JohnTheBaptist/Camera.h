@@ -4,8 +4,6 @@
 #include "MatrixInstance.h"
 #include "EngineIO.h"
 
-const float MininumVerticalFoV = 0.1f;
-const float MaxinumVerticalFoV = 6.28f;
 
 namespace InstanceHeirachy
 {
@@ -25,6 +23,9 @@ namespace InstanceHeirachy
         float AspectRatio;
         EngineIO::PixelGameEngine *EngineController;
 
+        const float MininumVerticalFoV = 0.1f;
+        const float MaxinumVerticalFoV = 6.28f;
+
     public:
         Camera(World* WorldRef, float FoV, EngineIO::PixelGameEngine* Controller)
         {
@@ -41,11 +42,14 @@ namespace InstanceHeirachy
 
         float GetHorizontalFoV()
         {
+            //we only store vertical fov, so we must convert this across using the formula
             return atanf(tanf(VerticalFoV * 0.5f) * (1.0f / GetAspectRatio())) * 2.0f;
         }
 
         void SetVerticalFoV(float FoV) 
         {
+            //Mininum and Maxinum just before and after 0, 2pi
+            //otherwise everything will break mathematically
             if (FoV < MininumVerticalFoV)
             {
                 FoV = MininumVerticalFoV;
@@ -60,6 +64,7 @@ namespace InstanceHeirachy
 
         void SetHorizontalFoV(float FoV)
         {
+            //we only store vertical fov, so we must convert this across using the formula
             SetVerticalFoV(atanf(GetAspectRatio() * tanf(FoV * 0.5f)) * 2.0f);
         }
 
@@ -114,6 +119,12 @@ namespace InstanceHeirachy
 
         std::vector<Plane> GetCullingPlanes(Matrix4x4 InverseTransform, Matrix4x4 InverseRotate)
         {
+            //Culling planes define where the camera can see
+            //If a point is above (ie dot product with normal > 0)
+            //all planes then the camera can see it
+
+            //The 6 planes are back, front, top, bottom, left, right
+
             Matrix4x4 CameraRotationMatrix = InverseRotate * ExtractRotationMatrix();
             Vector3D CameraPosition = InverseTransform * ExtractVectorPosition();
 

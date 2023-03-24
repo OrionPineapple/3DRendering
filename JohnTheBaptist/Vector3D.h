@@ -41,7 +41,6 @@ public:
 	{
 		std::cout << "Vector3D:" << std::endl;
 		std::cout << Vector.X << std::endl << Vector.Y << std::endl << Vector.Z << std::endl << Vector.W << std::endl;
-
 	}
 
 public:

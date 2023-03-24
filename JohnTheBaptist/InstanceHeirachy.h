@@ -17,6 +17,11 @@
 #include "Camera.h"
 #include "Subworld.h"
 
+/*
+The purpose of this is to include all of the InstanceHeirachy Namespace
+and to define how to destroy each type
+*/
+
 
 namespace InstanceHeirachy
 {

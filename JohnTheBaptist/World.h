@@ -35,6 +35,7 @@ namespace InstanceHeirachy
     public: 
         ~World()
         {
+            //it is important to clean up our memory of pointers
             std::map<int, Instance*>::iterator it = WorldInstances.begin();
 
             while (it != WorldInstances.end())
@@ -62,6 +63,7 @@ namespace InstanceHeirachy
 
         void DeleteInstance(int InstanceID)
         {
+            //this is called by the instance itself
             Instance* Ref = WorldInstances[InstanceID];
             WorldInstances.erase(InstanceID);
 
@@ -71,5 +73,7 @@ namespace InstanceHeirachy
     private:
         void DeleteInstancePointer(Instance* Ref);
         //this must be defined later as the compiler needs to know what each instance type is first :(
+        //however each instance needs to know what the world is too
+        //so we define deletion of each type of instance in the InstanceHeirachy
     };
 }

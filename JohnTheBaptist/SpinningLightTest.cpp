@@ -16,6 +16,7 @@
 //private:
 //    void PreFrame(float DeltaTime) override
 //    {
+//        //Standard Camera Movement
 //        InstanceHeirachy::Camera* Camera = GetCamera();
 //
 //        if (IsKeyDown(EngineIO::Key::UP))
@@ -65,6 +66,12 @@
 //            Camera->Translate(CameraRotationMatrix * Vector3D(0, 0, DeltaTime));
 //        }
 //
+//        //Here we alter the direction of each of our lights,
+//        //they are all seperated by 2/3 Pi radians of arc
+//        //We expect pure red or blue or green for faces that are directly facing the light
+//        //and for faces that are illuminated by 2 direction lights,
+//        //will expect a mixed colour eg orange or purple
+//
 //        BlueLight->SetDirection(Vector3D(sinf(GetRunTime() + 0.666f * PI), 0.0f, cosf(GetRunTime() + 0.6666f * PI)));
 //        RedLight->SetDirection(Vector3D(sinf(GetRunTime() + 1.33333 * PI), 0.0f, cosf(GetRunTime() + 1.333333f * PI)));
 //        GreenLight->SetDirection(Vector3D(sinf(GetRunTime()), 0.0f, cosf(GetRunTime())));
@@ -87,6 +94,8 @@
 //        InstanceHeirachy::Camera* Camera = GetCamera();
 //        Camera->SetMatrix(Matrix4x4::GetRotationMatrix(Vector3D(0, 0, 0)) * Matrix4x4::GetTranslationMatrix(Vector3D(0.0f, 0.0f, 4.0f)));
 //
+//
+//        //Create our 3 Test lights, each with 100% in their chosen channel colour
 //        RedLight = new InstanceHeirachy::DirectionalLight(World, Vector3D(0, 0, 0));
 //        RedLight->SetLightColour(ColourRGB(255, 0, 0));
 //        RedLight->SetParent(WorldRoot);

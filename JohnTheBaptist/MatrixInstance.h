@@ -5,6 +5,11 @@
 namespace InstanceHeirachy 
 {
 	//should be used as a virtual class as well eg class A : public virtual MatrixInstance
+
+    //this is any object with positional and rotational information
+    //we can apply all the standard matrix operations to this
+    //so we can rotate and translate components in our world 
+
 	class MatrixInstance : public virtual Instance
 	{
 	protected:

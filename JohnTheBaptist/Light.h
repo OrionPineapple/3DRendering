@@ -8,6 +8,8 @@ namespace InstanceHeirachy
 
     class Light : public virtual Instance
     {
+        //no public contructor as this is only to be inherited from
+
     private:
         ColourRGB Colour;
 

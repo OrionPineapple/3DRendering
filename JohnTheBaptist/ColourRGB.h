@@ -124,7 +124,8 @@ public:
 
 	static ColourRGB Multiply(ColourRGB A, ColourRGB B)
 	{
-		//multiply two colours
+		//multiply two colours by converting from 0->255 to 0->1
+        //then mutliply and convert back to the 0->255 format
 		return ColourRGB(
 			(int)(((float)A.Red * (float)B.Red) / 255.0f),
 			(int)(((float)A.Green * (float)B.Green) / 255.0f),
@@ -133,6 +134,7 @@ public:
 
     ColourRGB operator * (float Scalar)
     {
+        //multiples a colour by a scalar to alter intensity
         return ColourRGB((int)(Scalar * (float)Red), (int)(Scalar * (float)Green), (int)(Scalar * (float)Blue));
     }
 };

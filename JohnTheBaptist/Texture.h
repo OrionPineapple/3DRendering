@@ -142,4 +142,4 @@ private:
         return (data != nullptr);
     }
 
-};
+}; 

@@ -16,6 +16,10 @@ namespace InstanceHeirachy
 
     struct SubWorldStackFrame
     {
+        //This stores all needed render information
+        //This removes unneeded folders and parenting
+        //allows quick iteration over all lights
+
         std::string Name;
         Matrix4x4 Transform;
         std::vector<Light*> Lights;
@@ -37,6 +41,9 @@ namespace InstanceHeirachy
 
         SubWorldStackFrame GetSubWorldStackFrame()
         {
+            //we need to find all the subworlds, meshinstances and lights inside
+            //this subworld and return it as a stackframe
+
             std::queue<Instance*> InhabitantsToSort;
             SubWorldStackFrame Frame;
             Frame.Transform = GetMatrix();
@@ -44,6 +51,7 @@ namespace InstanceHeirachy
                 
             InstanceSearchParameter Search = InstanceSearchParameter();
             Search.SetEnabled(true);
+            //if it is disabled, we must completely ignore it, and not search its children either
 
             for (Instance* ChildRef : GetAllChildrenMatchingState(Search))
             {
@@ -52,12 +60,17 @@ namespace InstanceHeirachy
 
             while (InhabitantsToSort.size() > 0)
             {
+                //each child we find, we enqueue it
+                //we keep filtering through until no more  
+                //instance children are left to process 
+
                 Instance* Inhabitant = InhabitantsToSort.front();
 
                 switch (Inhabitant->GetBaseType())
                 {
                 case InstanceBaseType::LightBaseType:
                 {
+                    //we dont care what type of light, that can be dealt with later
                     Light* LightRef = dynamic_cast<Light*>(Inhabitant);
                     Frame.Lights.push_back(LightRef); 
                 }
@@ -66,6 +79,9 @@ namespace InstanceHeirachy
                 case InstanceBaseType::FolderBaseType:
                     for (Instance* ChildRef : Inhabitant->GetAllChildrenMatchingState(Search))
                     {
+                        //folders dont have any render use
+                        //only hold children
+                        //which we must search
                         InhabitantsToSort.push(ChildRef);
                     }
                     break;
@@ -76,6 +92,7 @@ namespace InstanceHeirachy
                     {
                     case InstanceType::MeshInstanceType:
                     {
+                        //we want to render this
                         MeshInstance* MeshInstanceRef = dynamic_cast<MeshInstance*>(Inhabitant);
                         Frame.Meshes.push_back(MeshInstanceRef); 
                     }
@@ -83,6 +100,9 @@ namespace InstanceHeirachy
 
                     case InstanceType::SubWorldType:
                     {
+                        //we dont want to search this yet
+                        //this is a completly different subworld
+
                         SubWorld* SubWorldRef = dynamic_cast<SubWorld*>(Inhabitant);
                         Frame.SubWorlds.push_back(SubWorldRef);
                     }

@@ -22,6 +22,10 @@ private:
 protected:
 	std::vector<std::shared_ptr<Point>> PointArray;
 	std::vector< std::shared_ptr<Triangle>> TriangleArray;
+    //Shared pointers are used so that when the triangle or point
+    //is no longer referenced, it is automatically cleaned up
+    //it is important for these to be done by pointers
+    //so that triangles can share points
 
 public:
 	Mesh()
@@ -34,6 +38,11 @@ private:
 	//mesh loading and saving helper functions
 	static std::vector<std::string> SplitString(std::string StringToSplit, std::string Splitter)
 	{
+        //Splits a string at each splitting string
+        //eg Hello|World|How|Are|You
+        //-> {Hello, World, How, Are, You}
+        //if the splitter is "|"
+
 		int PreviousIndex = 0;
 		int NextIndex = StringToSplit.find(Splitter, PreviousIndex);
 		int Length = StringToSplit.length();
@@ -52,6 +61,14 @@ private:
 
 	static void InterpretFaceData(std::string &vertex, int &Point, int &Normal, bool &UseNormal)
 	{
+        //Takes a Face line,
+        //and translates it form the form
+        //  23/23/53 
+        //into each index
+        //leftmost is the vertex index
+        //rightmost is the normal index
+        //middle is texture index
+
 		std::vector<std::string> SplitData = SplitString(vertex, "/");
 		std::strstream streamhandler;
 		if (SplitData.size() == 1)
@@ -78,11 +95,18 @@ public:
         PointArray = std::vector<std::shared_ptr<Point>>();
         TriangleArray = std::vector<std::shared_ptr<Triangle>>();
 
+        //Load File
 		std::ifstream FileInput;
 		std::string line = "";
 		FileInput.open(ObjFileName, std::ios::in);
 
+        //We need NormalData so we can store it
+        //before it is placed into triangles
+        //as they are not defined at point of triangle defintion
+
 		std::vector<Vector3D> NormalData;
+
+        //materials for triangles when loaded
         std::map<std::string, Material> MaterialData;
         Material CurrentMatt;
 
@@ -95,10 +119,10 @@ public:
 
 		while (FileInput) {
 			std::getline(FileInput, line);
-			//std::cout << line << std::endl;
 			std::strstream streamhandler;
 			streamhandler << line;
 
+            //v defines a vertex property such as a point or normal
 			if (line[0] == 'v')
 			{
 				//VertexNormalData
@@ -122,10 +146,13 @@ public:
 
 			}
 
+            //f indicates face data
 			else if (line[0] == 'f')
 			{
 				std::vector<std::string> FaceData = SplitString(line.substr(2, line.size() - 1), " ");
-
+                //We must determine how many points are on this face
+                //if it is complex we must use a triangulation algorithm
+    
 				if (FaceData.size() == 3)
 				{
 					//only one triangle, easy to handle
@@ -165,7 +192,7 @@ public:
 
 				else if (FaceData.size() == 4)
 				{
-					//a square is a trivial case, no ear clipping needed
+					//a quadlateral is a trivial case, no ear clipping needed
 					//Triangle 1 2 3 and 3 4 1
 
 					int p1, p2, p3, p4;
@@ -245,22 +272,16 @@ public:
                         TriangleArray.at(TriangleArray.size() - Count)->SetMaterial(CurrentMatt);
                     }
 				}
-
-				//int p1, p2, p3;
-				//char space_holder;
-				//streamhandler >> space_holder >> p1 >> p2 >> p3;
-
-				//std::shared_ptr<Triangle> NewTriangle = std::shared_ptr<Triangle>(new Triangle(NewMesh.PointArray[p1 - 1], NewMesh.PointArray[p2 - 1], NewMesh.PointArray[p3 - 1]));
-				////order is p3 then p2 then p1 as .obj uses anti-clockwise, we use clockwise
-				//NewMesh.TriangleArray.push_back(std::move(NewTriangle));
 			}
 
+            //load in a material data file
             else if (line.rfind("mtllib ", 0) == 0)
             {
                 std::string FileName = line.substr(7, line.size() - 7);
                 Material::MaterialMapWithFile(FileName, MaterialData);
             }
 
+            //use a specific predefined material
             else if (line.rfind("usemtl ", 0) == 0)
             {
                 std::string MaterialName = line.substr(7, line.size() - 7);
@@ -271,16 +292,6 @@ public:
 		FileInput.close();
 
 		std::cout << std::endl << "Mesh: " << ObjFileName << std::endl << "Tris: " << TriangleArray.size() << std::endl << "Points: " << PointArray.size() << std::endl;
-
-		//for each line in file
-
-		//if line is 'v' then
-		//create new point in PointArray with its coordinates
-		//eg v -1.0 1.000000 1.000000
-
-		//if line is 'f' then create triangle with reference to points given in line
-		//eg f 1 3 4
-		//1 would reference the first point instanced which would be PointArray[0] :)
 	}
 
 public:
@@ -305,12 +316,16 @@ public:
 		std::ofstream OutputOBJ(FileName);
 		OutputOBJ << "#" << FileDescription << std::endl;
 
+        //output each vertex to the file
 		for(std::shared_ptr<Point> Vertex : PointArray)
 		{
 			Vector3D Vector = Vertex->GetPosition();
 			OutputOBJ << "v " << Vector.GetX() << " " << Vector.GetY() << " " << Vector.GetZ() << std::endl;
 		}
 
+        //output each triangle to the file
+        //note that we will not convert these into faces,
+        //we keep them as triangles for simplicity
 		for (std::shared_ptr<Triangle> Face : TriangleArray)
 		{
 			std::shared_ptr<Point> A = Face->GetPointA();
@@ -340,9 +355,10 @@ public:
         return &TriangleArray;
     }
 
-public://temporary -> use MatrixInstance as that has reference to centre point
+public:
 	void Transform(Matrix4x4 Matrix)
 	{
+        //Apply a matrix transform to every point
 		for (int i = 0; i < PointArray.size(); i++)
 		{
 			PointArray[i]->Transform(Matrix);
@@ -352,16 +368,19 @@ public://temporary -> use MatrixInstance as that has reference to centre point
 		{
 			if (TriangleArray[i]->HasVertexNormals())
 			{
+                //we do not wish to translate the normals,
+                //only rotate them
 				TriangleArray[i]->SetVertexNormals(
-					Matrix * TriangleArray[i]->GetVertexNormalA(),
-					Matrix * TriangleArray[i]->GetVertexNormalA(),
-					Matrix * TriangleArray[i]->GetVertexNormalA());
+					Matrix.ExtractRotationMatrix() * TriangleArray[i]->GetVertexNormalA(),
+					Matrix.ExtractRotationMatrix() * TriangleArray[i]->GetVertexNormalA(),
+					Matrix.ExtractRotationMatrix() * TriangleArray[i]->GetVertexNormalA());
 			}
 		}
 	}
 
 	void Scale(float Scalar)
 	{
+        //Apply a scale factor to the mesh
 		for (int i = 0; i < PointArray.size(); i++)
 		{
 			PointArray[i]->Scale(Scalar);
@@ -396,16 +415,22 @@ private:
 
     std::vector<Vector2D> SquashToPlane(std::vector<int>& PointIndexes)
     {
+        //We take in a set of vertexes, and we wish to redefine them
+        //in 2D space so we determine the plance normal useing a cross product
+
         Vector3D AB = PointArray[PointIndexes[1]]->GetPosition() - PointArray[PointIndexes[0]]->GetPosition();
         Vector3D AC = PointArray[PointIndexes[2]]->GetPosition() - PointArray[PointIndexes[0]]->GetPosition();
 
         Vector3D PlaneNormal = Vector3D::Cross(AB, AC);
 
+        //Then determine unit vectors for our new plane
         Vector3D UnitVectorY = Vector3D::Normalise(Vector3D::Cross(PlaneNormal, AB));
         Vector3D UnitVectorX = Vector3D::Normalise(AB);
 
         std::vector<Vector2D> PointXY;
 
+        //Then for each point, define our 2D point as a
+        //scale factor of each unit vector x, y
         for (int i = 0; i < PointIndexes.size(); i++)
         {
             Vector3D PointXYZ = PointArray[PointIndexes[i]]->GetPosition();
@@ -421,6 +446,7 @@ private:
 
     float GetAngleOf3Points(Vector2D A, Vector2D B, Vector2D C)
     {
+        //Get the angle through 3 points to determine if its < Pi
         Vector2D AB = Vector2D::Normalise(B - A);
         Vector2D BC = Vector2D::Normalise(C - A);
 
@@ -450,6 +476,8 @@ private:
 
     bool IsTriangleEmpty(std::vector<Vector2D>& PointXY, Vector2D A, Vector2D B, Vector2D C)
     {
+        //Checks that no other points lie within this triangle
+
         Vector2D NormalAB = B - A;
         Vector2D NormalBC = C - B;
         Vector2D NormalCA = A - C;
@@ -462,8 +490,6 @@ private:
         NormalBC = -Vector2D(NormalBC.GetY(), -NormalBC.GetX());
         NormalCA = -Vector2D(NormalCA.GetY(), -NormalCA.GetX());
 
-        
-
         for (int i = 0; i < PointXY.size(); i++)
         {
             if (PointXY[i] == A || PointXY[i] == B || PointXY[i] == C)
@@ -471,9 +497,6 @@ private:
                 continue;
             }
 
-            std::cout << std::endl << std::endl << PointXY[i].GetX() << " :: " << PointXY[i].GetY();
-            std::cout << std::endl << "Dot: " << (Vector2D::Dot(NormalAB, PointXY[i] - A) >= 0.0f) << " " << (Vector2D::Dot(NormalBC, PointXY[i] - B) >= 0.0f) << " " << (Vector2D::Dot(NormalCA, PointXY[i] - C) >= 0.0f);
-            
             if (
                 Vector2D::Dot(NormalAB, PointXY[i] - A) >= 0.0f &&
                 Vector2D::Dot(NormalBC, PointXY[i] - B) >= 0.0f &&
@@ -512,13 +535,14 @@ private:
         std::vector<Vector2D> PointXY = SquashToPlane(PointIndexes);
         std::vector<Vector2D> AllPoints = std::vector<Vector2D>(PointXY);
         int Count = 0;
-        //Vector2D A = PointXY[1];
-        //Vector2D B = PointXY[3];
-        //Vector2D C = PointXY[6];
-        //std::cout << std::endl << "TESTTEST " << IsTriangleEmpty(AllPoints, A, B, C);
 
         while (PointXY.size() > 3)
         {
+            //While there is more 3 points left,
+            //remove a point that is an angle < Pi radians
+            //that contains no other points within its
+            //triangle
+
             for (int i = 0; i < PointXY.size(); i++)
             {
                 int Size = PointXY.size();
@@ -534,8 +558,7 @@ private:
                 {
                     if (IsTriangleEmpty(AllPoints, A, B, C))
                     {
-                        std::cout << std::endl << std::endl << "T: " << PointIndexes[i] << " " << PointIndexes[j] << " " << PointIndexes[k];
-
+                        //create our triangle
                         if (UseNormals) 
                         {
                             TriangleArray.push_back(std::shared_ptr<Triangle>(
@@ -566,12 +589,11 @@ private:
                         std::vector<int>::iterator iterator3 = NormalIndexes.begin() + i;
                         NormalIndexes.erase(iterator3);
                     }
-
-                    std::cout << std::endl << "T: " << PointIndexes[0] << " " << PointIndexes[1] << " " << PointIndexes[2];
                 }
             }
         }
 
+        //define final triangle
         if (UseNormals)
         {
             TriangleArray.push_back(std::shared_ptr<Triangle>(
