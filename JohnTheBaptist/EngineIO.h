@@ -1,3 +1,9 @@
+//This is the way my 3D renderer interacts with the computer. 
+//This is not my code - I simply used OLC Pixel Game engine and removed anything I didn't need 
+//and tried to make it as fast as I could for the sole purpose of rendering how I wanted to
+//I removed support for Mac and linux to make it shorter and quicker for my purpose too.
+
+
 #pragma once
 #include <cmath>
 #include <cstdint>
